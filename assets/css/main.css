@@ -27,7 +27,6 @@ section, summary, time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 	scroll-behavior: smooth;
-	word-spacing: normal;
 
 }
 
@@ -126,7 +125,7 @@ input, select, textarea {
 /* Type */
 
 	html {
-		font-size: 16pt;
+		font-size: 10pt;
 	}
 
 		@media screen and (max-width: 1680px) {
@@ -186,7 +185,7 @@ input, select, textarea {
 	}
 
 	p {
-		text-align: Left;
+		text-align: left;
 		margin: 0 0 2rem 0;
 	}
 

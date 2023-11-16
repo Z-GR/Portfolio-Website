@@ -26,7 +26,7 @@
 					<nav id="nav">
 						<ul class="links">
 							<li><a href="index.html">This is Me</a></li>
-							<li class="active"><a href="mai.html">Mai</a></li>
+							<li class="active"><a href="mai.html">MAI (Mobile Arm Interaction)</a></li>
 							<li><a href="rbsim.html">Robotics simulation</a></li>
 							<li><a href="outbreak.html">Outbreak</a></li>
 							<li><a href="#con">Contact</a></li>
@@ -52,13 +52,32 @@
 								</header>
 								<div class="image main"><img src="images/mai.jpg" alt="Image of the Mai robot" /></div>
 								<p>Mai has been developed using a Rasberry pi 4, arduino uno microcontroller the Python (interpreted launguage) and C++ (complied launguage) implimented within the Linux operating system (Distribution: Ubuntu server in headless operation) and the middleware ROS.</p>
-								<p>Mai has been made as an artifact for my computer science degree at the University of Portsmouth, this site will be updated in due course concurrently with Mai's development.</p>
+								<p>Mai has been made as an artifact for my computer science degree at the University of Portsmouth, the development of mai is now complete see below for details including my final undergraduate dissertation report.</p>
+								<p>The high level system architecture is as follows. The diagram shows the ROS Topics (arrows) used for communication via the WebSocket protocol. GPIO and serial are used for coms in the robot unit.</p>
+								<div class="image main"><img src="images/mai_arch.jpg" alt="Image of the Mai robot system architecture" /></div>
+								<header class="major">
+									<h2>Hardware schematic and parts list</h2>
+								</header>
+								<h2>Front View</h2>
+								<div class="image main"><img src="images/mai_schematic.jpg" alt="Image of the Mai robot system schematic" /></div>
+								<h2>Rear View</h2>
+								<div class="image main"><img src="images/mai_schematic1.jpg" alt="Image of the Mai robot system schematic" /></div>
+								<h2>3D View</h2>
 								<div class="sketchfab-embed-wrapper">
 									 <iframe class="image main" style="margin-left: auto; margin-right: auto;" title="Mai" width="640px" height="480px" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/40b45d93f7ea4429a400157628b06923/embed">  </iframe> 
 									 <p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4A4A4A;"> <a href="https://sketchfab.com/3d-models/mai-40b45d93f7ea4429a400157628b06923?utm_medium=embed&utm_campaign=share-popup&utm_content=40b45d93f7ea4429a400157628b06923" target="_blank" style="font-weight: bold; color: #1CAAD9;"> Mai </a> by <a href="https://sketchfab.com/ZakGR?utm_medium=embed&utm_campaign=share-popup&utm_content=40b45d93f7ea4429a400157628b06923" target="_blank" style="font-weight: bold; color: #1CAAD9;"> ZakGR </a> on <a href="https://sketchfab.com?utm_medium=embed&utm_campaign=share-popup&utm_content=40b45d93f7ea4429a400157628b06923" target="_blank" style="font-weight: bold; color: #1CAAD9;">Sketchfab</a></p>
 								</div>
+								<p>Mai's development was a success the final artefact is able to be remotely controlled using a VR interface, although this project was a success in generating a complete and working artefact it is
+									however limited in its function. Due to the low-grade hardware integrated the overall system is far from perfect whilst the final prototype is usable its not the most refined and accurate.
+									For example the lack of encoded motors drivetrain system, suspension or stable omnidirectional wheel mounting configuration causes drifting in movement and an overall noisy actuation. The arm is more stable as its
+									a pre-purchased unit although its low torque plastic construction and maximum load are all limiting factors to its operation as intended.
+								</p>
+								<p>The final artefact works very well as a proof of concept. This project will be rebooted in april 2023 for a new development cycle focused on improving the aspects discussed above. If you would like to get invloved in the project
+									please feel free to download the source code add this to your ROS Neotic Catkin workspace to get started. The report details all the dependencies required in chapter six.
+								</p>
 								<ul class="actions special">
-									<li><a href="downloadable/Mai-v0.3.zip" download class="button">Download Source</a></li>
+									<li><a href="downloadable/Mai - v0.6.zip" download class="button">Download Source v0.6</a></li>
+									<li><a href="downloadable/Mai Project Report.pdf" download class="button">Download Project Report</a></li>
 								</ul>
 							</section>
 
