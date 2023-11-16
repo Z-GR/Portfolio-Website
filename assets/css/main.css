@@ -3770,7 +3770,7 @@ input, select, textarea {
 /* Main */
 
 	#main {
-		background-color: #ffffff;
+		/*background-color: #ffffff;*/
 		position: relative;
 		margin: 0 auto;
 		margin-bottom: 3rem;
@@ -3797,7 +3797,15 @@ input, select, textarea {
 
 		#main > .post {
 			padding: 8rem 8rem 6rem 8rem ;
+			background-color: #ffffff;
+			margin-bottom: 3rem;
+			border-bottom-left-radius: 25px;
+			border-bottom-right-radius: 25px;
 		}
+
+			#main > .post:not(:first-of-type) {
+				border-radius: 25px;
+			}
 
 			#main > .post header.major > .date {
 				margin-top: -2rem;
@@ -3821,10 +3829,22 @@ input, select, textarea {
 
 			}
 
+			@media screen and (max-width: 980px) {
+
+				#main > .post {
+					padding: 6rem 4rem 4rem 4rem ;
+					border-top-right-radius: 25px;
+					border-top-left-radius: 25px;
+				}
+
+			}
+
 			@media screen and (max-width: 736px) {
 
 				#main > .post {
 					padding: 4rem 2rem 2rem 2rem ;
+					border-top-right-radius: 25px;
+					border-top-left-radius: 25px;
 				}
 
 					#main > .post header.major > .date {
@@ -3856,6 +3876,8 @@ input, select, textarea {
 			text-align: center;
 			width: 100%;
 			padding: 0;
+			background-color: #ffffff;
+			border-radius: 25px;
 		}
 
 			#main > .posts > * {
