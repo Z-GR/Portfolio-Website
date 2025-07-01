@@ -11,6 +11,17 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<script src="https://kit.fontawesome.com/094446f4c0.js" crossorigin="anonymous"></script>
+		<style type="text/css" media="screen">
+			#editor { 
+				position: relative;
+        		height: 50rem;
+			}
+			#editor1 { 
+				position: relative;
+        		height: 50rem;
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 
@@ -33,7 +44,7 @@
 							<li><a href="#con">Contact</a></li>
 						</ul>
 						<ul class="icons">
-							<li><a href="https://twitter.com/Zak_Rackham" target="_blank" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="https://twitter.com/Zak_Rackham" target="_blank" class="icon brands fa-x-twitter"><span class="label">Twitter</span></a></li>
 							<li><a href="https://www.facebook.com/zak.rackham" target="_blank" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
 							<li><a href="https://www.instagram.com/zak.i.e/" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
 							<li><a href="https://github.com/Z-GR" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
@@ -58,6 +69,521 @@
 									Your browser does not support the video tag.
 								</video>
 								</div>
+								<h2>V-REP Vision Sensor Blob Detection</h2>
+								<p>The script below is accociated with the vision sensor object and shows the implimentation of blob detection using the V-Rep API. For object localisation blob detection
+									has been implemented to return the x,y location of the center of
+									the front face of the box, however its depth cannot be perceived
+									without the use of a collocated second camera. Since the
+									depth of each box is constant it’s Y coordinate can be adjusted
+									by half the depth of the box to correspond the new point with
+									the center of the box. Once the object has been picked camera
+									one returns the RGB value for the box being manipulated and the
+									box is sorted accordingly to the correct drop point, youBot’s
+									base is then driven to a new target location where the box is
+									to be dropped.</p>
+								
+								<div class="image main" id="editor">
+function sysCall_init()
+	sensor=sim.getObjectAssociatedWithScript(sim.handle_self)
+	local res
+	res,nearClip=sim.getObjectFloatParameter(sensor,sim.visionfloatparam_near_clipping)
+	res,farClip=sim.getObjectFloatParameter(sensor,sim.visionfloatparam_far_clipping)
+	res,xAngle=sim.getObjectFloatParameter(sensor,sim.visionfloatparam_perspective_angle)
+	res,resX=sim.getObjectInt32Parameter(sensor,sim.visionintparam_resolution_x)
+	res,resY=sim.getObjectInt32Parameter(sensor,sim.visionintparam_resolution_y)
+	yAngle=xAngle
+	local ratio=resX/resY
+	if resX>resY then
+		yAngle=2*math.atan(math.tan(xAngle/2)/ratio)
+	else
+		xAngle=2*math.atan(math.tan(yAngle/2)/ratio)
+	end
+								
+end
+								
+function sysCall_sensing()
+	local m=sim.getObjectMatrix(sensor,-1)
+	local res,packet1,packet2=sim.handleVisionSensor(sensor)
+	if res>=0 then
+		local blobCnt=packet2[1]
+		local valCnt=packet2[2]
+		for i=0,blobCnt-1,1 do
+			local blobSize=packet2[2+valCnt*i+1]
+			local blobOrientation=packet2[2+valCnt*i+2]
+			local blobPositionX=packet2[2+valCnt*i+3]
+			local blobPositionY=packet2[2+valCnt*i+4]
+			local blobWidth=packet2[2+valCnt*i+5]
+			local blobHeight=packet2[2+valCnt*i+6]
+			local depthV=sim.getVisionSensorDepthBuffer(sensor,1+math.floor(blobPositionX*(resX-0.99)),1+math.floor(blobPositionY*(resY-0.99)),1,1)
+			local depth=nearClip+(farClip-nearClip)*depthV[1]
+			local coord={0,0,depth}
+			local x=0.5-blobPositionX
+			local y=blobPositionY-0.5
+			coord[1]=depth*math.tan(xAngle*0.5)*(0.5-blobPositionX)/0.5
+			coord[2]=depth*math.tan(yAngle*0.5)*(blobPositionY-0.5)/0.5
+			coord=sim.multiplyVector(m,coord)
+			sim.setFloatSignal('blobX', coord[1])
+			sim.setFloatSignal('blobY', coord[2])
+			sim.setFloatSignal('blobO', blobOrientation)
+			--print(blobOrientation)
+			-- coord now contains the position of the blob, in world coordinates
+		end
+	end
+end
+								</div>
+
+								<h2>V-REP Kuka Youbot Forward & Inverse Kinematics</h2>
+								<p>In order to move a robotic manipulator its
+									kinematic structure needs to be defined. Within v-rep the scene
+									hierarchy is used to build a kinematic structure formed as a
+									tree of joints and links. Using the simulators’ API a kinematic
+									group can be used to build an equivalent kinematic model via
+									the functions provided by the kinematics plugin.</p>
+
+								<p> Within the scenario detailed forward kinematics are used to
+									reach a pre-defined position that will be used as a reference
+									position for object manipulation. Forward kinematics is used
+									in the first instance of movement where the arm is initialised
+									to its reference position, due to the lower time complexity of
+									the algorithm that controls its movement, setting joint angles
+									is less processing heavy than inverse kinematics where joint
+									angles need to be calculated based on the position of the end-effector.</p>
+
+								</p>First the robot’s omni-directional base is translated to a new
+									target position, each wheel joint is given a set velocity to drive
+									the robot to the target position using forward kinematics. The
+									arm is then actuated to its reference position using forward
+									kinematics. Concurrently whist the arm is being actuated, the
+									front camera is active and a reading is taken from its image
+									frame blob detection is applied and a measurement is taken of
+									blob1 relative to the camera frame, this is then transformed to
+									the world cartesian coordinate system where the location of the
+									cube can be identified. YouBot’s arm can then be manipulated
+									to the target location using inverse kinematics and the object
+									can be picked.</p>
+								
+								<div class="image main" id="editor1">
+-- This script controls the Youbot task. It is threaded. In next sections, there are a lot of function definitions
+-- that ease the control of the robot. The arm of the robot is controlled in:
+--
+-- 1. Forward kinematics mode ( setFkMode() )
+-- 2. Inverse kinematics mode in position only ( setIkMode(false) )
+-- 3. Inverse kinematics mode in position and orientation (to keep the gripper vertical) ( setIkMode(true) )
+--
+-- The inverse kinematics calculations are then automatically applied to the physics engine, since the joints are in
+-- "hybrid IK mode" (see the joint properties dialog)
+--
+-- All inverse kinematics tasks are define in the IK properties dialog. There are 4 tasks:
+--
+-- "youBotUndamped_group": handles the inverse kinematics in position only. Resolution is not damped
+-- "youBotDamped_group": handles the inverse kinematics in position only. Resolution is damped. Useful when the previous IK task didn't succeed, because out of reach for instance
+-- "youBotUndamped_group": handles the inverse kinematics in position and orientation. Resolution is not damped
+-- "youBotDamped_group": handles the inverse kinematics in position and orientation. Resolution is damped. Useful when the previous IK task didn't succeed, because out of reach for instance
+--
+-- Above 4 tasks are enabled/disabled as needed. This is done with the "sim.setExplicitHandling" function.
+
+setIkMode=function(withOrientation)
+    sim.setThreadAutomaticSwitch(false) -- Don't get interrupted for this function
+    if (ikMode==false) then
+        sim.setObjectPosition(gripperTarget,-1,sim.getObjectPosition(gripperTip,-1))
+    end
+    if (withOrientation) then
+        sim.setExplicitHandling(ikWithOrientation1,0)
+        sim.setExplicitHandling(ikWithOrientation2,0)
+    else
+        sim.setExplicitHandling(ik1,0)
+        sim.setExplicitHandling(ik2,0)
+    end
+    for i=1,5,1 do
+        sim.setJointMode(armJoints[i],sim.jointmode_ik,1)
+    end
+    ikMode=true
+    sim.setThreadAutomaticSwitch(true)
+end
+
+setFkMode=function()
+    sim.setThreadAutomaticSwitch(false) -- Don't get interrupted for this function
+    sim.setExplicitHandling(ik1,1)
+    sim.setExplicitHandling(ik2,1)
+    sim.setExplicitHandling(ikWithOrientation1,1)
+    sim.setExplicitHandling(ikWithOrientation2,1)
+
+    for i=1,5,1 do
+        sim.setJointMode(armJoints[i],sim.jointmode_force,0)
+    end
+    ikMode=false
+    sim.setThreadAutomaticSwitch(true)
+end
+
+openGripper=function()
+    sim.tubeWrite(gripperCommunicationTube,sim.packInt32Table({1}))
+    sim.wait(0.8)
+end
+
+closeGripper=function()
+    sim.tubeWrite(gripperCommunicationTube,sim.packInt32Table({0}))
+    sim.wait(0.8)
+end
+
+setGripperTargetMovingWithVehicle=function()
+    sim.setObjectParent(gripperTarget,vehicleReference,true)
+end
+
+setGripperTargetFixedToWorld=function()
+    sim.setObjectParent(gripperTarget,-1,true)
+end
+
+waitToReachVehicleTargetPositionAndOrientation=function()
+    repeat
+        sim.switchThread() -- don't waste your time waiting!
+        p1=sim.getObjectPosition(vehicleTarget,-1)
+        p2=sim.getObjectPosition(vehicleReference,-1)
+        p={p2[1]-p1[1],p2[2]-p1[2]}
+        pError=math.sqrt(p[1]*p[1]+p[2]*p[2])
+        oError=math.abs(sim.getObjectOrientation(vehicleReference,vehicleTarget)[3])
+    until (pError&lt;0.001)and(oError&lt;0.1*math.pi/180) 
+end
+
+getBoxAdjustedMatrixAndFacingAngle=function(boxHandle)
+    p2=sim.getObjectPosition(boxHandle,-1)
+    p1=sim.getObjectPosition(vehicleReference,-1)
+    p={p2[1]-p1[1],p2[2]-p1[2],p2[3]-p1[3]}
+    pl=math.sqrt(p[1]*p[1]+p[2]*p[2]+p[3]*p[3])
+    p[1]=p[1]/pl
+    p[2]=p[2]/pl
+    p[3]=p[3]/pl
+    m=sim.getObjectMatrix(boxHandle,-1)
+    matchingScore=0
+    for i=1,3,1 do
+        v={m[0+i],m[4+i],m[8+i]}
+        score=v[1]*p[1]+v[2]*p[2]+v[3]*p[3]
+        if (math.abs(score)&gt;matchingScore) then
+            s=1
+            if (score&lt;0) then s=-1 end
+            matchingScore=math.abs(score)
+            bestMatch={v[1]*s,v[2]*s,v[3]*s}
+        end
+    end
+    angle=math.atan2(bestMatch[2],bestMatch[1])
+    m=sim.buildMatrix(p2,{0,0,angle})
+    return m, angle-math.pi/2
+end
+
+pickupBoxFromPlace=function(boxHandle,pickupConf)
+    local m,angle=getBoxAdjustedMatrixAndFacingAngle(boxHandle)
+    sim.setObjectPosition(vehicleTarget,-1,{m[4]-m[1]*dist1,m[8]-m[5]*dist1,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,angle})
+    setFkMode()
+    sim.rmlMoveToJointPositions(armJoints,-1,nil,nil,fkSpeed,fkAccel,fkJerk,pickupConf,nil)
+    waitToReachVehicleTargetPositionAndOrientation()
+    setIkMode(true)
+    setGripperTargetFixedToWorld()
+    local p=sim.getObjectPosition(gripperTarget,-1)
+    p[1]=m[4]
+    p[2]=m[8]
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    openGripper()
+    p[3]=m[12]
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    closeGripper()
+    p[3]=p[3]+0.1
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    setGripperTargetMovingWithVehicle()    
+    setFkMode()
+end
+
+dropToPlatform=function(platform)
+    setFkMode()
+    sim.rmlMoveToJointPositions(armJoints,-1,nil,nil,fkSpeed,{0.3,0.3,0.3,0.3,0.3},fkJerk,platform,nil)
+    openGripper()
+end
+
+pickupFromPlatformAndReorient=function(boxHandle)
+    setFkMode()
+    sim.rmlMoveToJointPositions(armJoints,-1,nil,nil,fkSpeed,fkAccel,fkJerk,platformIntermediateDrop,nil)
+    setIkMode(false)
+    local p=sim.getObjectPosition(boxHandle,-1)
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    closeGripper()
+    setFkMode()
+    -- Move a bit back from current position:
+    local m=sim.getObjectMatrix(vehicleTarget,-1)
+    sim.setObjectPosition(vehicleTarget,-1,{m[4]-m[2]*dist1,m[8]-m[6]*dist1,0})
+    -- Now drop it
+    sim.rmlMoveToJointPositions(armJoints,-1,nil,nil,fkSpeed,fkAccel,fkJerk,pickup2,nil)
+end
+
+dropToPlace=function(placeHandle,shift,verticalPos,startConf,noVerticalArmForUpMovement)
+    local m,angle=getBoxAdjustedMatrixAndFacingAngle(placeHandle)
+    m[4]=m[4]+m[2]*shift
+    m[8]=m[8]+m[6]*shift
+    sim.setObjectPosition(vehicleTarget,-1,{m[4]-m[1]*dist1,m[8]-m[5]*dist1,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,angle})
+    setFkMode()
+    sim.rmlMoveToJointPositions(armJoints,-1,nil,nil,fkSpeed,fkAccel,fkJerk,startConf,nil)
+    waitToReachVehicleTargetPositionAndOrientation()
+    setIkMode(true)
+    setGripperTargetFixedToWorld()
+    local p=sim.getObjectPosition(gripperTarget,-1)
+    p[1]=m[4]
+    p[2]=m[8]
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    p[3]=verticalPos
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    openGripper()
+    if (noVerticalArmForUpMovement) then
+        setIkMode(false)
+    end
+    p[3]=p[3]+0.1
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    setGripperTargetMovingWithVehicle()    
+    setFkMode()
+end
+
+sortByColor=function(dropHeight)
+    RGBValue=sim.getVisionSensorImage(vS0,0,0,0.1,0.1,0)
+    print("RED=",RGBValue[1],"BLUE=",RGBValue[2],"GREEN= ",RGBValue[3])
+
+    if (RGBValue[1] &lt; 1)and(RGBValue[2] &lt; 1)and(RGBValue[3] == 1)then
+        dropToPlace(d0,0,dropHeight,pickup2,false)
+    end
+    if (RGBValue[1] &lt; 1)and(RGBValue[2] == 1)and(RGBValue[3] &lt; 1)then
+        dropToPlace(d1,0,dropHeight,pickup2,false)
+    end
+    if (RGBValue[1] == 1)and(RGBValue[2] &lt; 1)and(RGBValue[3] &lt; 1)then
+        dropToPlace(d2,0,dropHeight,pickup2,false)
+    end
+end
+
+getBoxAdjustedMatrixAndFacingAngle2=function(position,matrix)
+    p2=position
+    p1=sim.getObjectPosition(vehicleReference,-1)
+    p={p2[1]-p1[1],p2[2]-p1[2],p2[3]-p1[3]}
+    pl=math.sqrt(p[1]*p[1]+p[2]*p[2]+p[3]*p[3])
+    p[1]=p[1]/pl
+    p[2]=p[2]/pl
+    p[3]=p[3]/pl
+    m=matrix
+    matchingScore=0
+    for i=1,3,1 do
+        v={m[0+i],m[4+i],m[8+i]}
+        score=v[1]*p[1]+v[2]*p[2]+v[3]*p[3]
+        if (math.abs(score)&gt;matchingScore) then
+            s=1
+            if (score&lt;0) then s=-1 end
+            matchingScore=math.abs(score)
+            bestMatch={v[1]*s,v[2]*s,v[3]*s}
+        end
+    end
+    angle=math.atan2(bestMatch[2],bestMatch[1])
+    m=sim.buildMatrix(p2,{0,0,angle})
+    return m, angle-math.pi/2
+end
+
+pickupBoxFromPlaceWithVision=function(position,matrix,pickupConf)
+    local m,angle=getBoxAdjustedMatrixAndFacingAngle2(position,matrix)
+    sim.setObjectPosition(vehicleTarget,-1,{m[4]-m[1]*dist3,m[8]-m[5]*dist3,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,angle})
+    waitToReachVehicleTargetPositionAndOrientation()
+    sim.rmlMoveToJointPositions(armJoints,-1,nil,nil,fkSpeed,fkAccel,fkJerk,pickup1,nil)
+    setIkMode(true)
+    p=sim.getObjectPosition(gripperTarget,-1)
+    p[1]=m[4]
+    p[2]=m[8]
+    p[3]=m[12]
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    closeGripper()
+    p[3]=p[3]+0.05
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    --setGripperTargetMovingWithVehicle()    
+    --setFkMode()
+end
+
+getPositionUsingVision=function()
+    local blobX=sim.getFloatSignal('blobX')
+    local blobY=sim.getFloatSignal('blobY')
+    local blobO=sim.getFloatSignal('blobO')
+    print("Position X =",blobX)
+    print("Position Y =",blobY)
+    return {(blobX+0.02),blobY,0.02}
+end
+
+getMatrixUsingVision=function()
+    local blobX=sim.getFloatSignal('blobX')
+    local blobY=sim.getFloatSignal('blobY')
+    local blobO=sim.getFloatSignal('blobO')
+    local m=sim.buildMatrix({(blobX),(blobY),0},{0,0,blobO})
+    return m
+end
+
+function sysCall_threadmain()
+    gripperTarget=sim.getObjectHandle('youBot_gripperPositionTarget')
+    gripperTip=sim.getObjectHandle('youBot_gripperPositionTip')
+    vehicleReference=sim.getObjectHandle('youBot_vehicleReference')
+    vehicleTarget=sim.getObjectHandle('youBot_vehicleTargetPosition')
+    armJoints={-1,-1,-1,-1,-1}
+    for i=0,4,1 do
+        armJoints[i+1]=sim.getObjectHandle('youBotArmJoint'..i)
+    end
+    ik1=sim.getIkGroupHandle('youBotUndamped_group')
+    ik2=sim.getIkGroupHandle('youBotDamped_group')
+    ikWithOrientation1=sim.getIkGroupHandle('youBotPosAndOrientUndamped_group')
+    ikWithOrientation2=sim.getIkGroupHandle('youBotPosAndOrientDamped_group')
+    gripperCommunicationTube=sim.tubeOpen(0,'youBotGripperState'..sim.getNameSuffix(nil),1)
+    d0=sim.getObjectHandle('dropPoint0')
+    d1=sim.getObjectHandle('dropPoint1')
+    d2=sim.getObjectHandle('dropPoint2')
+    pickupPosition0=sim.getObjectHandle('pickupPosition0')
+
+    vS0=sim.getObjectHandle('Vision_sensor')
+    vS1=sim.getObjectHandle('Vision_sensor0')
+    node0=sim.getObjectHandle('node0')
+    node0P=sim.getObjectPosition(node0,-1)
+    node1=sim.getObjectHandle('node1')
+    node1P=sim.getObjectPosition(node1,-1)
+
+    pickup1={0,-14.52*math.pi/180,-70.27*math.pi/180,-95.27*math.pi/180,0*math.pi/180}
+    pickup2={0,-13.39*math.pi/180,-93.91*math.pi/180,-72.72*math.pi/180,90*math.pi/180}
+    pickup3={0,-14.52*math.pi/180,-70.27*math.pi/180,-95.27*math.pi/180,90*math.pi/180}
+    platformIntermediateDrop={0,16*math.pi/180,52*math.pi/180,73*math.pi/180,0*math.pi/180}
+    platformDrop1={0,54.33*math.pi/180,32.88*math.pi/180,35.76*math.pi/180,0*math.pi/180}--{0,-0.4,0.2}
+    platformDrop2={0,40.74*math.pi/180,45.81*math.pi/180,59.24*math.pi/180,0*math.pi/180}--{0,-0.32,0.2}
+    platformDrop3={0,28.47*math.pi/180,55.09*math.pi/180,78.32*math.pi/180,0*math.pi/180}--{0,-0.24,0.2}
+
+    dist1=0.2
+    dist2=1
+    dist3=0.3
+    dropHeight1=0.035
+    dropHeight2=0.1
+    dropHeight3=0.155
+    ikSpeed={0.2,0.2,0.2,0.2}
+    ikAccel={0.1,0.1,0.1,0.1}
+    ikJerk={0.1,0.1,0.1,0.1}
+    fkSpeed={1,1,1,1,1}
+    fkAccel={0.6,0.6,0.6,0.6,0.6}
+    fkJerk={1,1,1,1,1}
+
+    shapePosition0={3.0000,-1.7300,0.4000}
+    shapePosition1={3.0000,-1.2528,0.4000}
+
+	size={6.0000e-02, 6.0000e-02, 6.0000e-02}
+
+    setGripperTargetMovingWithVehicle()
+    setFkMode()
+    openGripper()
+
+    --box1
+
+    shape1=sim.createPureShape(0,2 + 8,size,1,nil)
+    sim.setShapeColor(shape1,blue,sim.colorcomponent_ambient_diffuse,{0,0,255})
+    sim.setObjectPosition(shape1,-1,shapePosition0)
+    sim.setObjectSpecialProperty(shape1,sim.objectspecialproperty_renderable)
+
+    sim.setObjectPosition(vehicleTarget,-1,{1.1841,-1.7584,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+
+    m,angle=getBoxAdjustedMatrixAndFacingAngle2(getPositionUsingVision(),getMatrixUsingVision())
+    sim.setObjectPosition(vehicleTarget,-1,{m[4]-m[1]*dist3,m[8]-m[5]*dist3,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,angle})
+    waitToReachVehicleTargetPositionAndOrientation()
+    sim.rmlMoveToJointPositions(armJoints,-1,nil,nil,fkSpeed,fkAccel,fkJerk,pickup1,nil)
+    setIkMode(true)
+    p=sim.getObjectPosition(gripperTarget,-1)
+    p[1]=m[4]
+    p[2]=m[8]
+    p[3]=m[12]
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+    closeGripper()
+    p[3]=p[3]+0.05
+    sim.rmlMoveToPosition(gripperTarget,-1,-1,nil,nil,ikSpeed,ikAccel,ikJerk,p,nil,nil)
+
+    sortByColor(dropHeight1)
+
+    --box2
+    
+    shape2=sim.createPureShape(0,2 + 8,size,1,nil)
+    sim.setShapeColor(shape2,blue,sim.colorcomponent_ambient_diffuse,{0,255,0})
+    sim.setObjectPosition(shape2,-1,shapePosition0)
+    sim.setObjectSpecialProperty(shape2,sim.objectspecialproperty_renderable)
+
+    sim.setObjectPosition(vehicleTarget,-1,{1.1841,-1.7584,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+
+    pickupBoxFromPlaceWithVision(getPositionUsingVision(),getMatrixUsingVision(),pickup1)
+    sortByColor(dropHeight1)
+
+    --box3
+
+    shape3=sim.createPureShape(0,2 + 8,size,1,nil)
+    sim.setShapeColor(shape3,blue,sim.colorcomponent_ambient_diffuse,{255,0,0})
+    sim.setObjectPosition(shape3,-1,shapePosition0)
+    sim.setObjectSpecialProperty(shape3,sim.objectspecialproperty_renderable)
+
+    sim.setObjectPosition(vehicleTarget,-1,{1.1841,-1.7584,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+
+    pickupBoxFromPlaceWithVision(getPositionUsingVision(),getMatrixUsingVision(),pickup1)
+    --node based navigation
+    sim.setObjectPosition(vehicleTarget,-1,node0P)
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,-4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+    sim.setObjectPosition(vehicleTarget,-1,node1P)
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,-4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+    sortByColor(dropHeight1)
+
+    --box 4
+
+    shape4=sim.createPureShape(0,2 + 8,size,1,nil)
+    sim.setShapeColor(shape4,blue,sim.colorcomponent_ambient_diffuse,{0,255,0})
+    sim.setObjectPosition(shape4,-1,shapePosition0)
+    sim.setObjectSpecialProperty(shape4,sim.objectspecialproperty_renderable)
+    --node based navigation
+    sim.setObjectPosition(vehicleTarget,-1,node1P)
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+    sim.setObjectPosition(vehicleTarget,-1,node0P)
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+
+    sim.setObjectPosition(vehicleTarget,-1,{1.1841,-1.7584,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+
+    pickupBoxFromPlaceWithVision(getPositionUsingVision(),getMatrixUsingVision(),pickup1)
+    sim.setObjectPosition(vehicleTarget,-1,{1.1841,-1.7584,0})
+    sim.setObjectOrientation(vehicleTarget,-1,{0,0,4.71})
+    waitToReachVehicleTargetPositionAndOrientation()
+    dropToPlatform(platformDrop2)
+    pickupFromPlatformAndReorient(shape4)
+    sortByColor(dropHeight2)
+
+
+    sim.stopSimulation()
+end
+								</div>
+
+								<p>Supplementary project data is downloadable below.</p>
+									
+								<script src="assets/ace/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
+								<script>
+									var editor = ace.edit("editor");
+									editor.setTheme("ace/theme/monokai");
+									editor.session.setMode("ace/mode/lua");
+									editor.setReadOnly(true); 
+									editor.resize()
+								</script>
+								<script>
+									var editor = ace.edit("editor1");
+									editor.setTheme("ace/theme/monokai");
+									editor.session.setMode("ace/mode/lua");
+									editor.setReadOnly(true); 
+									editor.resize()
+								</script>
+
 								<ul class="actions special">
 									<li><a href="downloadable/rbsim.zip" download class="button">Download .zip</a></li>
 									<li><a href="downloadable/rbsim.pdf" download class="button">Download report</a></li>
@@ -92,7 +618,7 @@
 						<section class="split contact" id="con">
 							<section class="alt">
 								<h3>Address</h3>
-								<p>Portsmouth, PO1 </p>
+								<p>London/Essex </p>
 							</section>
 							<section>
 								<h3>Phone</h3>
@@ -105,7 +631,7 @@
 							<section>
 								<h3>Social</h3>
 								<ul class="icons alt">
-									<li><a href="https://twitter.com/Zak_Rackham" target="_blank" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+									<li><a href="https://twitter.com/Zak_Rackham" target="_blank" class="icon brands fa-x-twitter"><span class="label">Twitter</span></a></li>
 									<li><a href="https://www.facebook.com/zak.rackham" target="_blank" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
 									<li><a href="https://www.instagram.com/zak.i.e/" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
 									<li><a href="https://github.com/Z-GR" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>

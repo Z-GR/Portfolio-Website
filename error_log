@@ -1,0 +1,6 @@
+[08-Oct-2024 12:00:02 UTC] PHP Warning:  Module 'Phar' already loaded in Unknown on line 0
+[08-Oct-2024 12:00:02 UTC] PHP Warning:  Module 'mysqlnd' already loaded in Unknown on line 0
+[08-Oct-2024 12:00:02 UTC] PHP Warning:  Module 'mysqli' already loaded in Unknown on line 0
+[09-Oct-2024 12:00:02 UTC] PHP Warning:  Module 'Phar' already loaded in Unknown on line 0
+[09-Oct-2024 12:00:02 UTC] PHP Warning:  Module 'mysqlnd' already loaded in Unknown on line 0
+[09-Oct-2024 12:00:02 UTC] PHP Warning:  Module 'mysqli' already loaded in Unknown on line 0
