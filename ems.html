@@ -77,10 +77,7 @@
                                                   for continuous habitat regulation.</p>
 								</header>
 								<div>
-								<video class="image main" width="1000" autoplay controls>
-									<source src="videos/rbsim-video.mp4" type="video/mp4">
-									Your browser does not support the video tag.
-								</video>
+								<div class="image main"><img src="images/ems_wd.png" alt="EMS Wiring Diagram" /></div>
 								</div>
 								<h2>Arduino Code for Node MCU</h2>
 								<p>The code runs on an ESP8266 and uses a DHT11 sensor to measure temperature and humidity,
@@ -424,41 +421,23 @@ void loop() {
   yield();
 }</div>
 
-								<h2>V-REP Kuka Youbot Forward & Inverse Kinematics</h2>
-								<p>In order to move a robotic manipulator its
-									kinematic structure needs to be defined. Within v-rep the scene
-									hierarchy is used to build a kinematic structure formed as a
-									tree of joints and links. Using the simulators’ API a kinematic
-									group can be used to build an equivalent kinematic model via
-									the functions provided by the kinematics plugin.</p>
+								<h2>Enclosure</h2>
+								<p>The custom 3D-printed enclosure is designed in six sections to securely house the terrarium
+                                     management electronics. One section contains two 18650 lithium-ion batteries wired in parallel,
+                                      providing a combined capacity of around 5200 mAh at 3.7 V with a maximum continuous discharge
+                                       of approximately 20 A, ensuring stable and reliable power delivery. Another section holds
+                                        the OLED display and NodeMCU v3.0, allowing for both local monitoring and control.
+                                         The remaining four sections are dedicated to housing the relays, keeping the layout
+                                          compact, organized, and easy to service.</p>
 
-								<p> Within the scenario detailed forward kinematics are used to
-									reach a pre-defined position that will be used as a reference
-									position for object manipulation. Forward kinematics is used
-									in the first instance of movement where the arm is initialised
-									to its reference position, due to the lower time complexity of
-									the algorithm that controls its movement, setting joint angles
-									is less processing heavy than inverse kinematics where joint
-									angles need to be calculated based on the position of the end-effector.</p>
-
-								</p>First the robot’s omni-directional base is translated to a new
-									target position, each wheel joint is given a set velocity to drive
-									the robot to the target position using forward kinematics. The
-									arm is then actuated to its reference position using forward
-									kinematics. Concurrently whist the arm is being actuated, the
-									front camera is active and a reading is taken from its image
-									frame blob detection is applied and a measurement is taken of
-									blob1 relative to the camera frame, this is then transformed to
-									the world cartesian coordinate system where the location of the
-									cube can be identified. YouBot’s arm can then be manipulated
-									to the target location using inverse kinematics and the object
-									can be picked.</p>
-
-								<p>Supplementary project data is downloadable below.</p>
+                                <div class="sketchfab-embed-wrapper"> 
+											<iframe class="image main" title="EMS Enclosure" width="640px" height="480px" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/f61e70f5bd23498b9c8c3401b98af92c/embed"> </iframe>
+											 <p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4A4A4A;"> <a href="https://sketchfab.com/3d-models/enclosure-f61e70f5bd23498b9c8c3401b98af92c?utm_medium=embed&utm_campaign=share-popup&utm_content=f61e70f5bd23498b9c8c3401b98af92c" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;"> Mai V0.9 </a> by <a href="https://sketchfab.com/ZakGR?utm_medium=embed&utm_campaign=share-popup&utm_content=f61e70f5bd23498b9c8c3401b98af92c" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;">ZGR</a> on <a href="https://sketchfab.com?utm_medium=embed&utm_campaign=share-popup&utm_content=7f960338f8324cbdbdf2dfddb952722f" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;">Sketchfab</a></p>
+								</div>
 
 								<ul class="actions special">
-									<li><a href="downloadable/rbsim.zip" download class="button">Download .zip</a></li>
-									<li><a href="downloadable/rbsim.pdf" download class="button">Download report</a></li>
+									<li><a href="downloadable/Terrarium-Environment-Management-System.zip" download class="button">Download .zip</a></li>
+									<!--<li><a href="downloadable/rbsim.pdf" download class="button">Download Report</a></li>-->
 								</ul>
 								</section>
 
