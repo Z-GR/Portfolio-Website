@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>EMS, Environment Management System</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <script src="https://kit.fontawesome.com/094446f4c0.js" crossorigin="anonymous"></script>
+
+    <style type="text/css" media="screen">
+        /* Ace editor container */
+        #editor {
+            position: relative;      /* required by Ace */
+            height: 50rem;           /* fixed height */
+            overflow: auto;          /* allow scrolling */
+            border: 1px solid #444;  /* optional styling */
+        }
+    </style>
+</head>
+<body class="is-preload">
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <a href="index.html" class="logo">Robotics simulation</a>
+    </header>
+
+    <!-- Nav -->
+    <nav id="nav">
+        <ul class="links">
+            <li><a href="index.html">Overview</a></li>
+            <li><a href="mai.html">Mai</a></li>
+            <li><a href="rbsim.html">Robotics simulation</a></li>
+            <li><a href="outbreak.html">Outbreak</a></li>
+            <li><a href="dataScience.html">Data Science</a></li>
+            <li class="active"><a href="ems.html">EMS</a></li>
+            <li><a href="#con">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main content -->
+    <div id="main">
+        <section class="post">
+            <header class="major">
+                <span class="date">January, 2022</span>
+                <h1>Robotic simulation</h1>
+                <p>An autonomous robotic pick-and-place system integrating advanced computer vision algorithms...</p>
+            </header>
+
+            <video class="image main" width="1000" autoplay controls>
+                <source src="videos/rbsim-video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <h2>V-REP Vision Sensor Blob Detection</h2>
+            <p>The script below is associated with the vision sensor object...</p>
+
+            <!-- REMOVED editor from here -->
+        </section>
+    </div>
+
+    <!-- Ace Editor Section (outside scroll-managed .post) -->
+    <section style="padding: 2rem;">
+        <h2>EMS Client Code</h2>
+        <div id="editor">
+/* Paste your full ESP8266 code here */
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <section>
+            <form method="post" action="https://getform.io/f/6f4e77a8-22eb-4592-9616-395d3516473c">
+                <div class="fields">
+                    <div class="field">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" id="name" />
+                    </div>
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="text" name="email" id="email" />
+                    </div>
+                    <div class="field">
+                        <label for="message">Message</label>
+                        <textarea name="message" id="message" rows="3"></textarea>
+                    </div>
+                </div>
+                <ul class="actions">
+                    <li><input type="submit" value="Send Message" /></li>
+                </ul>
+            </form>
+        </section>
+    </footer>
+
+</div> <!-- End wrapper -->
+
+<!-- Scripts -->
+<script src="assets/ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/jquery.scrollex.min.js"></script>
+<script src="assets/js/jquery.scrolly.min.js"></script>
+<script src="assets/js/browser.min.js"></script>
+<script src="assets/js/breakpoints.min.js"></script>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/main.js"></script>
+
+<script>
+    // Initialize Ace
+    const editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/c_cpp");
+    editor.setReadOnly(true);
+
+    // Stop HTML5 UP scroll hijacking inside the editor
+    const editorEl = document.getElementById('editor');
+    editorEl.addEventListener('wheel', function(e){ e.stopPropagation(); });
+    editorEl.addEventListener('touchmove', function(e){ e.stopPropagation(); });
+</script>
+
+</body>
+</html>
