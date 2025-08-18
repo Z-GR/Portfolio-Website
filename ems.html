@@ -1,0 +1,518 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+	adapted and edited by Zak GR
+	zakgrackham.uk
+-->
+<html>
+	<head>
+		<title>EMS</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<script src="https://kit.fontawesome.com/094446f4c0.js" crossorigin="anonymous"></script>
+		<style type="text/css" media="screen">
+			/* Completely override any main.css styles affecting the editor */
+            #editor {
+                position: relative;
+        		height: 50rem;
+            }
+
+            /* Ensure parent containers don’t hide overflow */
+            #editor * {
+                overflow: visible !important;
+            }
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="index.html" class="logo">EMS</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="index.html">Overview</a></li>
+							<li><a href="mai.html">Mai</a></li>
+							<li><a href="rbsim.html">Robotics simulation</a></li>
+							<li><a href="outbreak.html">Outbreak</a></li>
+							<li><a href="dataScience.html">Data Science</a></li>
+                            <li class="active"><a href="ems.html">EMS</a></li>
+							<li><a href="#con">Contact</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://twitter.com/Zak_Rackham" target="_blank" class="icon brands fa-x-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="https://www.facebook.com/zak.rackham" target="_blank" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+							<li><a href="https://www.instagram.com/zak.i.e/" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+							<li><a href="https://github.com/Z-GR" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<span class="date">August, 2025</span>
+									<h1>EMS An Environment Management System</h1>
+									<p>This project applies an Environmental Management System (EMS)
+                                         concept as a Terrarium Management System designed specifically
+                                          for a crested gecko habitat. The system regulates key environmental
+                                           factors such as temperature and humidity, using an ultrasonic
+                                            atomiser to maintain proper humidity levels and a set of fans
+                                             to provide cooling when needed. Control and automation are managed
+                                              through a NodeMCU v3.0 microcontroller paired with relays, while MQTT
+                                               protocol handles network communications, enabling remote monitoring
+                                                and control. The unit is powered by two 18650 lithium-ion batteries
+                                                 wired in parallel, providing a stable and efficient power supply
+                                                  for continuous habitat regulation.</p>
+								</header>
+								<div>
+								<div class="image main"><img src="images/ems_wd.png" alt="EMS Wiring Diagram" /></div>
+								</div>
+								<h2>Arduino Code for Node MCU</h2>
+								<p>The code runs on an ESP8266 and uses a DHT11 sensor to measure temperature and humidity,
+                                     displaying values on an OLED screen. It connects to Wi-Fi and communicates with an MQTT
+                                      broker to publish sensor readings and receive commands. Relays control a fan and humidifier,
+                                       which can run automatically based on sensor thresholds or manually through MQTT messages.
+                                        The main loop cycles through reading the sensor, updating the display, publishing data,
+                                         and managing MQTT connections.</p>
+
+								<div class="image main" id="editor">/*
+* @file ESP8266 Environment Management System
+* @brief Client system for EMS
+* @author Zak G Rackham
+* Contact: zak.g.rackham@gmail.com
+*/
+#include <DHT11.h>
+
+#include <ESP8266WiFi.h>
+
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <PubSubClient.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
+// The pins for I2C are defined by the Wire-library. 
+// On an arduino UNO:       A4(SDA), A5(SCL)
+// On an arduino MEGA 2560: 20(SDA), 21(SCL)
+// On an arduino LEONARDO:   2(SDA),  3(SCL), ...
+#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+#define WIFI_NAME "SSID"
+#define WIFI_PASSWORD "PASSWORD"
+
+WiFiClient espClient;
+PubSubClient client;
+unsigned long lastMsg = 0;
+unsigned long lastMsg1 = 0;
+#define MSG_BUFFER_SIZE	(50)
+char msg[MSG_BUFFER_SIZE];
+char msg1[MSG_BUFFER_SIZE];
+int value = 0;
+
+int temperature = 0;
+int humidity = 0;
+
+int count = 0;
+
+// Create an instance of the DHT11 class.
+// - For Arduino: Connect the sensor to Digital I/O Pin 2.
+// - For ESP32: Connect the sensor to pin GPIO2 or P2.
+// - For ESP8266: Connect the sensor to GPIO2 or D4.
+DHT11 dht11(2);
+
+int fansys = 14;
+bool fanstate = false;
+bool humidifierstate = false;
+
+void setup() {
+  pinMode(2, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
+  pinMode(14, OUTPUT);    // Initialise the RELAY_TRIGGER pin as an output
+  pinMode(0, OUTPUT);    // Initialise the RELAY_TRIGGER pin as an output
+
+
+  Serial.begin(9600);
+
+  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+  }
+
+  // Show initial display buffer contents on the screen --
+  // the library initializes this with an Adafruit splash screen.
+  display.display();
+  delay(2000); // Pause for 2 seconds
+
+  // Clear the buffer
+  display.clearDisplay();
+
+  // Draw a single pixel in white
+  display.drawPixel(10, 10, SSD1306_WHITE);
+
+  // Show the display buffer on the screen. You MUST call display() after
+  // drawing commands to make them visible on screen!
+  display.display();
+  delay(2000);
+  // display.display() is NOT necessary after every single drawing command,
+  // unless that's what you want...rather, you can batch up a bunch of
+  // drawing operations and then update the screen all at once by calling
+  // display.display(). These examples demonstrate both approaches...
+
+  //testdrawrect();      // Draw rectangles (outlines)
+
+  WiFi.begin(WIFI_NAME, WIFI_PASSWORD);
+
+  Serial.print("Connecting");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println();
+
+  Serial.print("Connected, IP address: ");
+  Serial.println(WiFi.localIP());
+
+  //Setup the pubsub client connection
+
+  client.setClient(espClient);
+    client.setServer(SERVER IP,1883);
+    client.setCallback(callback);
+    // client is now configured for use
+
+  updatetext(); //Boot info screen
+
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+
+  // Switch on the LED if an 1 was received as first character
+  if ((char)payload[0] == '1') {
+    Serial.print("Message arrived = 1");
+    fanstate = true;
+
+  } 
+  
+  // Switch on the LED if an 1 was received as first character
+  if ((char)payload[0] == '0') {
+    Serial.print("Message arrived = 0");
+    fanstate = false;
+  }
+
+  if ((char)payload[0] == '2') {
+    Serial.print("Message arrived = 2");
+    humidifierstate = true;
+
+  } 
+
+  if ((char)payload[0] == '3') {
+    Serial.print("Message arrived = 3");
+    humidifierstate = false;
+  } 
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Create a random client ID
+    String clientId = "ESP8266Client-";
+    clientId += String(random(0xffff), HEX);
+    yield();
+    // Attempt to connect
+    if (client.connect(clientId.c_str())) {
+      Serial.println("connected");
+      yield();
+      // Once connected, publish an announcement...
+      client.publish("outTopic", "EMS Online");
+      // ... and resubscribe
+      client.subscribe("inTopic");
+      client.subscribe("emsSetFan", 0);
+      client.subscribe("emsSetHumidifier", 0);
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again on next execution");
+      // Wait 5 seconds before retrying
+      delay(1000);
+      break;
+    }
+  }
+}
+
+void testdrawrect(void) {
+  display.clearDisplay();
+
+  for(int16_t i=0; i<display.height()/2; i+=2) {
+    display.drawRect(i, i, display.width()-2*i, display.height()-2*i, SSD1306_WHITE);
+    display.display(); // Update screen with each newly-drawn rectangle
+    delay(1);
+  }
+
+  delay(2000);
+}
+
+void updatetext(void) {
+  display.clearDisplay();
+
+  display.setTextSize(1);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.setCursor(0,0);             // Start at top-left corner
+  display.setTextSize(2);
+  display.println(F("EMS v1.1"));
+
+  display.setTextSize(1);
+  display.println("By Zak G Rackham");
+
+  display.display();
+  delay(2000);
+
+}
+
+void updatedht11display(void) {
+  display.clearDisplay();
+  display.cp437(true);  // Use correct CP437 character codes
+
+  display.setTextSize(1);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.setCursor(0,0);             // Start at top-left corner
+  display.setTextSize(2);
+  display.print(F("T: "));
+  display.print(temperature);
+  display.write(0xF8);
+  display.println();
+  display.println();
+  display.println();
+
+  display.setTextSize(2);
+  display.print("H: ");
+  display.print(humidity);
+
+  display.display();
+  delay(2000);
+
+}
+
+void readdht() {
+  // Attempt to read the temperature and humidity values from the DHT11 sensor.
+  int result = dht11.readTemperatureHumidity(temperature, humidity);
+
+  // Check the results of the readings.
+  // If the reading is successful, print the temperature and humidity values.
+  // If there are errors, print the appropriate error messages.
+  if (result == 0) {
+      Serial.print("Temperature: ");
+      Serial.print(temperature);
+      Serial.print(" °C\tHumidity: ");
+      Serial.print(humidity);
+      Serial.println(" %");
+  } else {
+      // Print error message based on the error code.
+      Serial.println(DHT11::getErrorString(result));
+      yield();
+  }
+
+}
+
+void publishtemp() {
+
+  unsigned long now = millis();
+  if (now - lastMsg > 2000) {
+    lastMsg = now;
+    ++value;
+    snprintf (msg, MSG_BUFFER_SIZE, "%ld", temperature);
+    Serial.print("Publish message: ");
+    Serial.println(msg);
+    client.publish("emsTemperature", msg);
+  }
+}
+
+void publishhum() {
+
+  unsigned long now1 = millis();
+  if (now1 - lastMsg1 > 2000) {
+    lastMsg1 = now1;
+    ++value;
+    snprintf (msg1, MSG_BUFFER_SIZE, "%ld", humidity);
+    Serial.print("Publish message: ");
+    Serial.println(msg1);
+    client.publish("emsHumidity", msg1);
+  }
+
+}
+ 
+// the loop function runs over and over again forever
+void loop() {
+  ++count;
+
+  switch (count) {
+  case 1:
+    readdht();
+    updatedht11display();
+    break;
+  case 2:
+    client.loop();
+    yield();
+    break;
+  case 3:
+    publishtemp();
+    break;
+  case 4:
+    publishhum();
+    break;
+  case 5:
+    if (!client.connected()) {
+      reconnect();
+    }
+    count = 0;
+    break;
+}
+
+  if (!fanstate){
+    //Turn on cooling auto
+    if (temperature > 25 && humidity > 50){
+      digitalWrite(14, HIGH);
+    }
+    else {
+      digitalWrite(14, LOW);
+    }
+  } else {
+    //Turn on cooling manual
+    digitalWrite(14, HIGH);
+  }
+
+  if (!humidifierstate){
+    //Turn on cooling auto
+    if (humidity < 50){
+      digitalWrite(0, HIGH);
+    }
+    else {
+      digitalWrite(0, LOW);
+    }
+  } else {
+    //Turn on cooling manual
+    digitalWrite(0, HIGH);
+  }
+
+  yield();
+}</div>
+
+								<h2>Enclosure</h2>
+								<p>The custom 3D-printed enclosure is designed in six sections to securely house the terrarium
+                                     management electronics. One section contains two 18650 lithium-ion batteries wired in parallel,
+                                      providing a combined capacity of around 5200 mAh at 3.7 V with a maximum continuous discharge
+                                       of approximately 20 A, ensuring stable and reliable power delivery. Another section holds
+                                        the OLED display and NodeMCU v3.0, allowing for both local monitoring and control.
+                                         The remaining four sections are dedicated to housing the relays, keeping the layout
+                                          compact, organized, and easy to service.</p>
+
+                                <div class="sketchfab-embed-wrapper"> 
+											<iframe class="image main" title="EMS Enclosure" width="640px" height="480px" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/f61e70f5bd23498b9c8c3401b98af92c/embed"> </iframe>
+											 <p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4A4A4A;"> <a href="https://sketchfab.com/3d-models/enclosure-f61e70f5bd23498b9c8c3401b98af92c?utm_medium=embed&utm_campaign=share-popup&utm_content=f61e70f5bd23498b9c8c3401b98af92c" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;"> Mai V0.9 </a> by <a href="https://sketchfab.com/ZakGR?utm_medium=embed&utm_campaign=share-popup&utm_content=f61e70f5bd23498b9c8c3401b98af92c" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;">ZGR</a> on <a href="https://sketchfab.com?utm_medium=embed&utm_campaign=share-popup&utm_content=7f960338f8324cbdbdf2dfddb952722f" target="_blank" rel="nofollow" style="font-weight: bold; color: #1CAAD9;">Sketchfab</a></p>
+								</div>
+
+								<ul class="actions special">
+									<li><a href="downloadable/Terrarium-Environment-Management-System.zip" download class="button">Download .zip</a></li>
+									<!--<li><a href="downloadable/rbsim.pdf" download class="button">Download Report</a></li>-->
+								</ul>
+								</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							<form method="post" action="https://getform.io/f/6f4e77a8-22eb-4592-9616-395d3516473c">
+								<div class="fields">
+									<div class="field">
+										<label for="name">Name</label>
+										<input type="text" name="name" id="name" />
+									</div>
+									<div class="field">
+										<label for="email">Email</label>
+										<input type="text" name="email" id="email" />
+									</div>
+									<div class="field">
+										<label for="message">Message</label>
+										<textarea name="message" id="message" rows="3"></textarea>
+									</div>
+								</div>
+								<ul class="actions">
+									<li><input type="submit" value="Send Message" /></li>
+								</ul>
+							</form>
+						</section>
+						<section class="split contact" id="con">
+							<section class="alt">
+								<h3>Address</h3>
+								<p>London/Essex </p>
+							</section>
+							<section>
+								<h3>Phone</h3>
+								<p><a href="tel:07595408155">07595408155</a></p>
+							</section>
+							<section>
+								<h3>Email</h3>
+								<p><a href="mailto:zakgrackham@gmail.com">zakgrackham@gmail.com</a></p>
+							</section>
+							<section>
+								<h3>Social</h3>
+								<ul class="icons alt">
+									<li><a href="https://twitter.com/Zak_Rackham" target="_blank" class="icon brands fa-x-twitter"><span class="label">Twitter</span></a></li>
+									<li><a href="https://www.facebook.com/zak.rackham" target="_blank" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+									<li><a href="https://www.instagram.com/zak.i.e/" target="_blank" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+									<li><a href="https://github.com/Z-GR" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+								</ul>
+							</section>
+						</section>
+					</footer>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Zak Graham Rackham 2021</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<!--<script src="assets/js/jquery.min.js"></script>-->
+			<!--<script src="assets/js/jquery.scrollex.min.js"></script>-->
+			<!--<script src="assets/js/jquery.scrolly.min.js"></script>-->
+			<!--<script src="assets/js/browser.min.js"></script>-->
+			<!--<script src="assets/js/breakpoints.min.js"></script>-->
+			<!--<script src="assets/js/util.js"></script>-->
+			<!--<script src="assets/js/main.js"></script>-->
+            <script src="assets/ace/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
+            <script>
+                const editor = ace.edit("editor");
+                editor.setTheme("ace/theme/monokai");
+                editor.session.setMode("ace/mode/c_cpp");
+                editor.setReadOnly(true);
+                editor.resize();
+            </script>
+	</body>
+</html>
