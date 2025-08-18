@@ -8,7 +8,7 @@
 -->
 <html>
 	<head>
-		<title>EMS, Environment Management System</title>
+		<title>EMS</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -34,7 +34,7 @@
 
 				<!-- Header -->
 					<header id="header">
-						<a href="index.html" class="logo">Robotics simulation</a>
+						<a href="index.html" class="logo">EMS</a>
 					</header>
 
 				<!-- Nav -->
@@ -62,14 +62,19 @@
 						<!-- Post -->
 							<section class="post">
 								<header class="major">
-									<span class="date">January, 2022</span>
-									<h1>Robotic simulation</h1>
-									<p>An autonomous robotic pick-and-place
-                                         system integrating advanced computer vision algorithms
-                                          for precise object localization in unstructured environments,
-                                           augmented by real-time multimodal sensory data processing
-                                            to facilitate dynamic collision avoidance and ensure safe,
-                                             adaptive manipulation in complex operational contexts.</p>
+									<span class="date">August, 2025</span>
+									<h1>EMS An Environment Management System</h1>
+									<p>This project applies an Environmental Management System (EMS)
+                                         concept as a Terrarium Management System designed specifically
+                                          for a crested gecko habitat. The system regulates key environmental
+                                           factors such as temperature and humidity, using an ultrasonic
+                                            atomiser to maintain proper humidity levels and a set of fans
+                                             to provide cooling when needed. Control and automation are managed
+                                              through a NodeMCU v3.0 microcontroller paired with relays, while MQTT
+                                               protocol handles network communications, enabling remote monitoring
+                                                and control. The unit is powered by two 18650 lithium-ion batteries
+                                                 wired in parallel, providing a stable and efficient power supply
+                                                  for continuous habitat regulation.</p>
 								</header>
 								<div>
 								<video class="image main" width="1000" autoplay controls>
@@ -77,18 +82,13 @@
 									Your browser does not support the video tag.
 								</video>
 								</div>
-								<h2>V-REP Vision Sensor Blob Detection</h2>
-								<p>The script below is accociated with the vision sensor object and shows the implimentation of blob detection using the V-Rep API. For object localisation blob detection
-									has been implemented to return the x,y location of the center of
-									the front face of the box, however its depth cannot be perceived
-									without the use of a collocated second camera. Since the
-									depth of each box is constant it’s Y coordinate can be adjusted
-									by half the depth of the box to correspond the new point with
-									the center of the box. Once the object has been picked camera
-									one returns the RGB value for the box being manipulated and the
-									box is sorted accordingly to the correct drop point, youBot’s
-									base is then driven to a new target location where the box is
-									to be dropped.</p>
+								<h2>Arduino Code for Node MCU</h2>
+								<p>The code runs on an ESP8266 and uses a DHT11 sensor to measure temperature and humidity,
+                                     displaying values on an OLED screen. It connects to Wi-Fi and communicates with an MQTT
+                                      broker to publish sensor readings and receive commands. Relays control a fan and humidifier,
+                                       which can run automatically based on sensor thresholds or manually through MQTT messages.
+                                        The main loop cycles through reading the sensor, updating the display, publishing data,
+                                         and managing MQTT connections.</p>
 
 								<div class="image main" id="editor">/*
 * @file ESP8266 Environment Management System
