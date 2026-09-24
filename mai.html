@@ -9,8 +9,16 @@
 <html>
 	<head>
 		<title>Robotic Teleoperation Using VR</title>
+		<meta name="description" content="Mai: a VR-teleoperated mobile service robot built on ROS, Raspberry Pi and Arduino, with Python and C++." />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="Robotic Teleoperation Using VR" />
+		<meta property="og:description" content="Mai: a VR-teleoperated mobile service robot built on ROS, Raspberry Pi and Arduino, with Python and C++." />
+		<meta property="og:url" content="https://www.zakgrackham.uk/mai.html" />
+		<meta property="og:image" content="https://www.zakgrackham.uk/images/mai.jpg" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 		<script src="https://kit.fontawesome.com/094446f4c0.js" crossorigin="anonymous"></script>
@@ -53,23 +61,23 @@
 								<header class="major">
 									<span class="date">April 2024</span>
 									<h1>Robotic Teleoperation Using VR (V0.9)</h1>
-									<p>This project aims to develop Mai, a VR-enabled, teleoperable mobile service robot built on the Robot Operating System (ROS). The system is designed to allow users to intuitively perform physical tasks remotely using a virtual reality interface, effectively acting as a real-time proxy for human presence and manipulation.
+									<p>This project aims to develop Mai, a VR-enabled, teleoperable mobile service robot built on the Robot Operating System (ROS). The system is designed to allow users to intuitively perform physical tasks remotely using a virtual reality interface, effectively acting as a real-time proxy for human presence and manipulation.</p>
 
-										<p>The software stack leverages ROS as the middleware for robot communication, coordination, and control. Core components are implemented using both Python and C++ to balance rapid development with high-performance execution. Python is used for high-level scripting, user interface integration, and prototyping, while C++ is employed for time-critical operations such as motion control, sensor processing, and real-time data handling.</pp>
+										<p>The software stack leverages ROS as the middleware for robot communication, coordination, and control. Core components are implemented using both Python and C++ to balance rapid development with high-performance execution. Python is used for high-level scripting, user interface integration, and prototyping, while C++ is employed for time-critical operations such as motion control, sensor processing, and real-time data handling.</p>
 										
 										<p>The system runs on a Linux-based operating environment, providing a stable, flexible, and open-source platform for development and deployment. By integrating VR technologies with robotic mobility and manipulation, Mai enables users to bypass the constraints of physical travel, particularly for mundane or repetitive tasks, and operate in remote environments with ease and precision.</p>
 									<h3>Body Panels</h3>
-									<p>Mai now has new body panels that protect the internals form collision and damage. Each panel has been designed to use the V-slot extrusion profile for easy and secure mounting.</p>
+									<p>Mai now has new body panels that protect the internals from collision and damage. Each panel has been designed to use the V-slot extrusion profile for easy and secure mounting.</p>
 									<h3>Edge Software Auto Launch (Pre-Alpha)</h3>
-									<p>Before this update each node / microservice within the ROS middleware had to be launched manually, now on boot Mai starts all these services allowing seamless operation once the VR client is connected.</p>
+									<p>Before this update, each node / microservice within the ROS middleware had to be launched manually, now on boot Mai starts all these services allowing seamless operation once the VR client is connected.</p>
 									<p></p>
 									<h3>Meta API Integrated For Use With New Oculus Hardware And Meta Headsets (Pre-Alpha)</h3>
-									<p>As part of the new client software the Quest2 has been the main focus for the new configuration. V0.6 is fully compatable with the Rift and Rift S.</p>
+									<p>As part of the new client software the Quest2 has been the main focus for the new configuration. V0.6 is fully compatible with the Rift and Rift S.</p>
 									<h4>Change Log</h4>
 										<ul>
 											<li><p>Lift + has now been added as a mapping to the Quest 2 & 3.</p></li>
-											<li><p>The interface for viewing mai's environment has been re-designed.</p></li>
-											<li><p>New Interface for the status of mai's joint angles and positions (Debug).</p></li>
+											<li><p>The interface for viewing Mai's environment has been re-designed.</p></li>
+											<li><p>New Interface for the status of Mai's joint angles and positions (Debug).</p></li>
 										</ul>
 										<div class="sketchfab-embed-wrapper"> 
 											<iframe class="image main" title="Mai V0.9" width="640px" height="480px" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/7f960338f8324cbdbdf2dfddb952722f/embed?autostart=1"> </iframe>
@@ -82,9 +90,9 @@
 									<h1>Robotic Teleoperation Using VR (V0.6)</h1>
 								</header>
 								<div class="image main"><img src="images/mai.jpg" alt="Image of the Mai robot" /></div>
-								<p>Mai has been developed using a Raspberry pi 4, arduino uno microcontroller Python and C++ implemented within Linux (Distribution: Ubuntu server in headless operation) and the middleware ROS.</p>
-								<p>Mai has been made as an artifact for my computer science degree at the University of Portsmouth, the development of mai is now complete see below for details including my final undergraduate dissertation report.</p>
-								<p>The high level system architecture is as follows. The diagram shows the ROS Topics (arrows) used for communication via the WebSocket protocol. GPIO and serial are used for communication within in the robot control unit.</p>
+								<p>Mai has been developed using a Raspberry Pi 4 and an Arduino Uno microcontroller, with Python and C++ implemented within Linux (Distribution: Ubuntu server in headless operation) and the middleware ROS.</p>
+								<p>Mai has been made as an artifact for my computer science degree at the University of Portsmouth. The V0.6 development cycle is complete; see below for details including my final undergraduate dissertation report.</p>
+								<p>The high level system architecture is as follows. The diagram shows the ROS Topics (arrows) used for communication via the WebSocket protocol. GPIO and serial are used for communication within the robot control unit.</p>
 								<div class="image main"><img src="images/mai_arch.jpg" alt="Image of the Mai robot system architecture" /></div>
 								<header class="major">
 									<h2>Hardware schematic and parts list</h2>
@@ -98,17 +106,17 @@
 									 <iframe class="image main" style="margin-left: auto; margin-right: auto;" title="Mai" width="640px" height="480px" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/40b45d93f7ea4429a400157628b06923/embed">  </iframe> 
 									 <p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4A4A4A;"> <a href="https://sketchfab.com/3d-models/mai-40b45d93f7ea4429a400157628b06923?utm_medium=embed&utm_campaign=share-popup&utm_content=40b45d93f7ea4429a400157628b06923" target="_blank" style="font-weight: bold; color: #1CAAD9;"> Mai </a> by <a href="https://sketchfab.com/ZakGR?utm_medium=embed&utm_campaign=share-popup&utm_content=40b45d93f7ea4429a400157628b06923" target="_blank" style="font-weight: bold; color: #1CAAD9;"> ZakGR </a> on <a href="https://sketchfab.com?utm_medium=embed&utm_campaign=share-popup&utm_content=40b45d93f7ea4429a400157628b06923" target="_blank" style="font-weight: bold; color: #1CAAD9;">Sketchfab</a></p>
 								</div>
-								<p>Mai's development was a success the final artefact is able to be remotely controlled using a VR interface, although this project was a success in generating a complete and working artefact it is
-									however limited in its function. Due to the low-grade hardware integrated the overall system is far from perfect whilst the final prototype is usable its not the most refined and accurate.
-									For example the lack of encoded motors drivetrain system, suspension or stable omnidirectional wheel mounting configuration causes drifting in movement and an overall noisy actuation. The arm is more stable as its
-									a pre-purchased unit although its low torque plastic construction and maximum load are all limiting factors to its operation as intended.
+								<p>Mai's development was a success: the final artefact is able to be remotely controlled using a VR interface, although this project was a success in generating a complete and working artefact, it is
+									however limited in its function. Due to the low-grade hardware integrated the overall system is far from perfect; whilst the final prototype is usable, it's not the most refined and accurate.
+									For example, the lack of an encoded-motor drivetrain, suspension or stable omnidirectional wheel mounting configuration causes drifting in movement and an overall noisy actuation. The arm is more stable as it's
+									a pre-purchased unit although its low-torque plastic construction and maximum load are all limiting factors to its operation as intended.
 								</p>
-								<p>The final artefact works very well as a proof of concept. This project will be rebooted in april 2023 for a new development cycle focused on improving the aspects discussed above. If you would like to get involved in the project
-									please feel free to download the source code add this to your ROS Neotic Catkin workspace to get started. The report details all the dependencies required in chapter six.
+								<p>The final artefact works very well as a proof of concept. This project will be rebooted in April 2023 for a new development cycle focused on improving the aspects discussed above. If you would like to get involved in the project
+									please feel free to download the source code and add it to your ROS Noetic catkin workspace to get started. The report details all the dependencies required in chapter six.
 								</p>
 								<ul class="actions special">
-									<li><a href="downloadable/Mai - v0.6.zip" download class="button">Download Source v0.6</a></li>
-									<li><a href="downloadable/Mai Project Report.pdf" download class="button">Download Project Report</a></li>
+									<li><a href="downloadable/Mai-v0.6.zip" download class="button">Download Source v0.6</a></li>
+									<li><a href="downloadable/Mai-Project-Report.pdf" download class="button">Download Project Report</a></li>
 								</ul>
 
 							</section>
@@ -122,15 +130,15 @@
                             <div class="fields">
                                 <div class="field">
                                     <label for="name">Name</label>
-                                    <input type="text" name="name" id="name" />
+                                    <input type="text" name="name" id="name" autocomplete="name" required />
                                 </div>
                                 <div class="field">
                                     <label for="email">Email</label>
-                                    <input type="text" name="email" id="email" />
+                                    <input type="email" name="email" id="email" autocomplete="email" required />
                                 </div>
                                 <div class="field">
                                     <label for="message">Message</label>
-                                    <textarea name="message" id="message" rows="3"></textarea>
+                                    <textarea name="message" id="message" rows="3" required></textarea>
                                 </div>
                             </div>
                             <ul class="actions">
@@ -145,7 +153,7 @@
                         </section>
                         <section>
                             <h3>Phone</h3>
-                            <p><a href="tel:0">available on request</a></p>
+                            <p>Available on request</p>
                         </section>
                         <section>
                             <h3>Email</h3>
@@ -165,7 +173,7 @@
 
 				<!-- Copyright -->
 					<div id="copyright">
-						<ul><li>&copy; Zak Graham Rackham 2022</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+						<ul><li>&copy; Zak Graham Rackham 2025</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
 					</div>
 
 			</div>
