@@ -9,8 +9,16 @@
 <html>
 	<head>
 		<title>Robotics simulation</title>
+		<meta name="description" content="Robotic pick-and-place simulation of the KUKA youBot in V-REP using computer vision blob detection and inverse kinematics." />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="Robotics simulation" />
+		<meta property="og:description" content="Robotic pick-and-place simulation of the KUKA youBot in V-REP using computer vision blob detection and inverse kinematics." />
+		<meta property="og:url" content="https://www.zakgrackham.uk/rbsim.html" />
+		<meta property="og:image" content="https://www.zakgrackham.uk/images/R1.png" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 		<script src="https://kit.fontawesome.com/094446f4c0.js" crossorigin="anonymous"></script>
@@ -84,11 +92,11 @@
 								</video>
 								</div>
 								<h2>V-REP Vision Sensor Blob Detection</h2>
-								<p>The script below is accociated with the vision sensor object and shows the implimentation of blob detection using the V-Rep API. For object localisation blob detection
+								<p>The script below is associated with the vision sensor object and shows the implementation of blob detection using the V-Rep API. For object localisation blob detection
 									has been implemented to return the x,y location of the center of
 									the front face of the box, however its depth cannot be perceived
-									without the use of a collocated second camera. Since the
-									depth of each box is constant it’s Y coordinate can be adjusted
+									without the use of a co-located second camera. Since the
+									depth of each box is constant, its Y coordinate can be adjusted
 									by half the depth of the box to correspond the new point with
 									the center of the box. Once the object has been picked camera
 									one returns the RGB value for the box being manipulated and the
@@ -146,11 +154,11 @@ function sysCall_sensing()
 end
 								</div>
 
-								<h2>V-REP Kuka Youbot Forward & Inverse Kinematics</h2>
+								<h2>V-REP KUKA youBot Forward & Inverse Kinematics</h2>
 								<p>In order to move a robotic manipulator its
 									kinematic structure needs to be defined. Within v-rep the scene
 									hierarchy is used to build a kinematic structure formed as a
-									tree of joints and links. Using the simulators’ API a kinematic
+									tree of joints and links. Using the simulator’s API a kinematic
 									group can be used to build an equivalent kinematic model via
 									the functions provided by the kinematics plugin.</p>
 
@@ -163,11 +171,11 @@ end
 									is less processing heavy than inverse kinematics where joint
 									angles need to be calculated based on the position of the end-effector.</p>
 
-								</p>First the robot’s omni-directional base is translated to a new
+								<p>First the robot’s omni-directional base is translated to a new
 									target position, each wheel joint is given a set velocity to drive
 									the robot to the target position using forward kinematics. The
 									arm is then actuated to its reference position using forward
-									kinematics. Concurrently whist the arm is being actuated, the
+									kinematics. Concurrently, whilst the arm is being actuated, the
 									front camera is active and a reading is taken from its image
 									frame blob detection is applied and a measurement is taken of
 									blob1 relative to the camera frame, this is then transformed to
@@ -613,15 +621,15 @@ end
 								<div class="fields">
 									<div class="field">
 										<label for="name">Name</label>
-										<input type="text" name="name" id="name" />
+										<input type="text" name="name" id="name" autocomplete="name" required />
 									</div>
 									<div class="field">
 										<label for="email">Email</label>
-										<input type="text" name="email" id="email" />
+										<input type="email" name="email" id="email" autocomplete="email" required />
 									</div>
 									<div class="field">
 										<label for="message">Message</label>
-										<textarea name="message" id="message" rows="3"></textarea>
+										<textarea name="message" id="message" rows="3" required></textarea>
 									</div>
 								</div>
 								<ul class="actions">
@@ -636,7 +644,7 @@ end
 							</section>
 							<section>
 								<h3>Phone</h3>
-								<p><a href="tel:0">available on request</a></p>
+								<p>Available on request</p>
 							</section>
 							<section>
 								<h3>Email</h3>
@@ -656,7 +664,7 @@ end
 
 				<!-- Copyright -->
 					<div id="copyright">
-						<ul><li>&copy; Zak Graham Rackham 2021</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+						<ul><li>&copy; Zak Graham Rackham 2025</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
 					</div>
 
 			</div>
