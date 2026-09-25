@@ -237,9 +237,19 @@ body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; 
 	box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
-/* The first pane joins the nav bar above it. */
-#main > .post:first-child {
-	border-top: 0;
+/* Desktop: the nav bar is its own floating pane, separated from the content. */
+@media screen and (min-width: 981px) {
+	#nav {
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		margin-bottom: 2rem;
+		overflow: hidden;
+		box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+	}
+
+	#main > .post:first-child {
+		border-radius: 25px;
+	}
 }
 
 #main > .posts {
