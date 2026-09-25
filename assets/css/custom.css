@@ -248,7 +248,7 @@ body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; 
 	}
 
 	#main > .post:first-child {
-		border-radius: 25px;
+		border-radius: var(--radius);
 	}
 }
 
@@ -313,7 +313,7 @@ ul.alt li, ul.divided li {
 
 /* Images get a thin frame. */
 .image img {
-	border-radius: 8px;
+	border-radius: var(--radius);
 }
 
 .image.main img, .image.fit img {
@@ -362,7 +362,7 @@ ul.alt li, ul.divided li {
 input[type="submit"], input[type="reset"], input[type="button"], button, .button {
 	box-shadow: inset 0 0 0 1px var(--accent);
 	color: var(--accent) !important;
-	border-radius: 8px;
+	border-radius: var(--radius);
 	letter-spacing: 0.02em;
 	text-transform: lowercase;
 	font-weight: 500;
@@ -384,7 +384,7 @@ input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hove
 input[type="text"], input[type="password"], input[type="email"], select, textarea {
 	background: var(--bg);
 	border: 1px solid var(--border);
-	border-radius: 8px;
+	border-radius: var(--radius);
 	color: var(--fg-bold);
 }
 
@@ -463,7 +463,7 @@ ul.icons.alt li a.icon:hover:before {
 	color: var(--fg-bold);
 	letter-spacing: 0;
 	text-transform: lowercase;
-	border-radius: 8px;
+	border-radius: var(--radius);
 }
 
 #navPanelToggle.alt:hover {
@@ -492,4 +492,23 @@ ul.icons.alt li a.icon:hover:before {
 @media (prefers-reduced-motion: reduce) {
 	#intro h1:after { animation: none; }
 	#main > .posts > article { transition: none; }
+}
+
+/* One corner radius everywhere, matching the nav bar. */
+#main,
+#main > .post,
+#main > .post:not(:first-of-type),
+#main > .posts,
+#footer,
+#navPanelToggle,
+.image,
+.image img,
+video.image,
+#editor, #editor1,
+.sketchfab-embed-wrapper iframe,
+input[type="text"], input[type="password"], input[type="email"], select, textarea,
+input[type="submit"], input[type="reset"], input[type="button"], button, .button,
+input[type="submit"].icon.solo, input[type="reset"].icon.solo, input[type="button"].icon.solo, button.icon.solo, .button.icon.solo,
+ul.icons li .icon:before {
+	border-radius: var(--radius);
 }
