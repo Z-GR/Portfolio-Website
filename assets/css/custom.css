@@ -749,3 +749,13 @@ ul.icons li .icon:before {
 	box-shadow: none;
 	outline: none;
 }
+
+/* Terminal tap targets: every tap should count, so no double-tap zoom,
+   word selection or tap flash on them. */
+#intro h1,
+#copyright li {
+	touch-action: manipulation;
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+}
