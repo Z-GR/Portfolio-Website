@@ -1,0 +1,26 @@
+/* Site-specific overrides loaded after the HTML5 UP template (main.css). */
+
+/* X (Twitter) logo: the bundled Font Awesome 5 predates it, so ship just that glyph from Font Awesome 6. */
+@font-face {
+	font-family: 'FA X Twitter';
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+	src: url("../webfonts/fa-x-twitter.woff2") format("woff2");
+}
+
+.icon.brands.fa-x-twitter:before {
+	content: "\e61b";
+	font-family: 'FA X Twitter';
+}
+
+/* Keep nav labels on one line and share the bar's width evenly, so the extra social icon doesn't squeeze them. */
+#nav ul.links li {
+	flex: 1 1 auto;
+}
+
+#nav ul.links li a {
+	white-space: nowrap;
+	text-align: center;
+	padding: 0 0.75rem;
+}
