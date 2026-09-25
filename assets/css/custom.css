@@ -480,6 +480,37 @@ ul.icons.alt li a.icon:hover:before {
 	border-top: 1px solid var(--border);
 }
 
+/* Menu links match the desktop nav bar. */
+#navPanel .links li a {
+	border-bottom: 0;
+	border-radius: var(--radius);
+	color: var(--fg-muted);
+	font-size: 0.9rem;
+	font-weight: 500;
+	letter-spacing: 0;
+	padding: 0.75rem;
+	text-transform: lowercase;
+}
+
+#navPanel .links li a:hover {
+	background-color: var(--accent-soft);
+	color: var(--fg-bold) !important;
+}
+
+#navPanel .links li.active a {
+	color: var(--accent);
+	box-shadow: inset 2px 0 0 var(--accent);
+}
+
+#navPanel .links li.active a:before {
+	content: "> ";
+}
+
+#navPanel ul.icons li a.icon {
+	border-bottom: 0;
+	color: var(--fg-muted);
+}
+
 #navPanel .close {
 	color: var(--fg-muted);
 }
