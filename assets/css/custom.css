@@ -609,3 +609,26 @@ ul.icons li .icon:before {
 
 	.role-body { padding: 1.5rem 2rem 2rem 2rem; }
 }
+
+/* Private space: passphrase form. */
+.vault-form {
+	max-width: 28rem;
+	margin: 0 auto;
+}
+
+.vault-status {
+	min-height: 1.9em;
+	margin: 0;
+	text-align: center;
+	color: var(--fg-muted);
+}
+
+#main > .post:focus {
+	outline: none;
+}
+
+.vault-form label {
+	color: var(--accent);
+	letter-spacing: 0.02em;
+	text-transform: lowercase;
+}
