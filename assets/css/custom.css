@@ -759,3 +759,69 @@ ul.icons li .icon:before {
 	user-select: none;
 	-webkit-tap-highlight-color: transparent;
 }
+
+/* Project groups (commercial / personal / academic): each is a posts grid
+   with a full-width heading first, so card borders are keyed on card
+   position (nth-of-type) rather than child position. */
+#main > .posts.grouped > .group-title {
+	width: 100%;
+	margin: 0;
+	padding: 4rem 4rem 2.5rem 4rem;
+	border: 0;
+	text-align: center;
+}
+
+#main > .posts.grouped > .group-title h2 {
+	font-size: 2rem;
+	margin-bottom: 0.5rem;
+}
+
+#main > .posts.grouped > .group-title h2:before {
+	content: "# ";
+	color: var(--accent);
+}
+
+#main > .posts.grouped > .group-title p {
+	color: var(--fg-muted);
+	margin: 0;
+}
+
+#main > .posts.grouped > article {
+	border-left-width: 2px;
+	border-top-width: 2px;
+}
+
+#main > .posts.grouped > article:nth-of-type(2n - 1) {
+	border-left-width: 0;
+}
+
+@media screen and (max-width: 736px) {
+	#main > .posts.grouped > .group-title {
+		padding: 2.5rem 2rem 1.5rem 2rem;
+	}
+
+	#main > .posts.grouped > .group-title h2 {
+		font-size: 1.5rem;
+	}
+
+	#main > .posts.grouped > article:nth-of-type(n) {
+		border-left-width: 0;
+	}
+}
+
+/* Commercial cards have no images; the date line carries period and sector. */
+#main > .posts > article.commercial p.tags {
+	color: var(--fg-muted);
+	font-size: 0.8rem;
+	margin-bottom: 0;
+}
+
+#main > .posts > article.commercial p.tags:before {
+	content: "$ tags: ";
+	color: var(--accent);
+}
+
+/* Keep the same gap between consecutive project panes as between other panes. */
+#main > .posts.grouped + .posts.grouped {
+	margin-top: 3rem;
+}
