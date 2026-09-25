@@ -105,7 +105,7 @@
 			print(listed.join('  '));
 		},
 		whoami: function() {
-			print('zak rackham: engineer building robotics, IoT & automation systems');
+			print('zak rackham: software engineer turning ideas into systems');
 		},
 		date: function() {
 			print(new Date().toString());
