@@ -228,17 +228,27 @@ body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; 
 
 /* Main panels --------------------------------------------------------------- */
 
-#main {
-	background-color: var(--panel);
-}
-
-#main > * {
-	border-top: 1px solid var(--border);
-}
-
+/* Each section is a pane floating above the background; the template's
+   margins between them let the grid show through. */
 #main > .post,
 #main > .posts {
 	background-color: var(--panel);
+	border: 1px solid var(--border);
+	box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+/* The first pane joins the nav bar above it. */
+#main > .post:first-child {
+	border-top: 0;
+}
+
+#main > .posts {
+	overflow: hidden;
+}
+
+#footer {
+	border: 1px solid var(--border);
+	box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
 }
 
 #main > .post header.major > h1,
