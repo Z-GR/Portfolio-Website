@@ -15,33 +15,14 @@
 		VAULT_PASS='...' node tools/vault.mjs encrypt   # private-src/pages/ (or content.html) -> private.html
 		VAULT_PASS='...' node tools/vault.mjs decrypt   # private.html -> private-src/pages/ (or content.html)
 
-	Crypto: PBKDF2-SHA256 (600,000 iterations, 16-byte random salt) derives a
-	256-bit AES-GCM key; a fresh 12-byte IV is used on every encryption.
-	assets/js/vault.js performs the matching decryption in the browser.
+	The crypto lives in tools/vault-lib.mjs; assets/js/vault.js performs the
+	matching decryption in the browser.
 */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
-import { webcrypto as crypto } from 'node:crypto';
+import { PAGE, encryptInto, decryptFrom } from './vault-lib.mjs';
 
-const ITERATIONS = 600000;
 const SOURCE = 'private-src/content.html';
 const PAGES = 'private-src/pages';
-const PAGE = 'private.html';
-const START = '<script id="vault-data" type="application/json">';
-const END = '</script>';
-
-const b64 = (bytes) => Buffer.from(bytes).toString('base64');
-const unb64 = (text) => new Uint8Array(Buffer.from(text, 'base64'));
-
-async function deriveKey(passphrase, salt, iterations) {
-	const material = await crypto.subtle.importKey('raw', new TextEncoder().encode(passphrase), 'PBKDF2', false, ['deriveKey']);
-	return crypto.subtle.deriveKey(
-		{ name: 'PBKDF2', hash: 'SHA-256', salt, iterations },
-		material,
-		{ name: 'AES-GCM', length: 256 },
-		false,
-		['encrypt', 'decrypt']
-	);
-}
 
 // Pages bundle as JSON { pages: [{ id, html }] }; the legacy format is plain HTML.
 function readSource() {
@@ -67,13 +48,6 @@ function writeSource(text) {
 	return SOURCE;
 }
 
-function readPayload(page) {
-	const start = page.indexOf(START);
-	const end = page.indexOf(END, start);
-	if (start < 0 || end < 0) throw new Error(`No vault-data block found in ${PAGE}`);
-	return { start: start + START.length, end };
-}
-
 const passphrase = process.env.VAULT_PASS;
 if (!passphrase) {
 	console.error('Set the passphrase in the VAULT_PASS environment variable.');
@@ -82,23 +56,15 @@ if (!passphrase) {
 
 const mode = process.argv[2];
 const page = readFileSync(PAGE, 'utf8');
-const { start, end } = readPayload(page);
 
 if (mode === 'encrypt') {
-	const salt = crypto.getRandomValues(new Uint8Array(16));
-	const iv = crypto.getRandomValues(new Uint8Array(12));
-	const key = await deriveKey(passphrase, salt, ITERATIONS);
-	const plaintext = new TextEncoder().encode(readSource());
-	const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext));
-	const payload = JSON.stringify({ v: 1, iterations: ITERATIONS, salt: b64(salt), iv: b64(iv), data: b64(ciphertext) });
-	writeFileSync(PAGE, page.slice(0, start) + payload + page.slice(end));
-	console.log(`Encrypted ${existsSync(PAGES) ? PAGES + '/' : SOURCE} into ${PAGE} (${ciphertext.length} bytes).`);
+	const { html, bytes } = await encryptInto(page, passphrase, readSource());
+	writeFileSync(PAGE, html);
+	console.log(`Encrypted ${existsSync(PAGES) ? PAGES + '/' : SOURCE} into ${PAGE} (${bytes} bytes).`);
 } else if (mode === 'decrypt') {
-	const payload = JSON.parse(page.slice(start, end));
-	const key = await deriveKey(passphrase, unb64(payload.salt), payload.iterations);
-	const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(payload.iv) }, key, unb64(payload.data))
+	const text = await decryptFrom(page, passphrase)
 		.catch(() => { console.error('Wrong passphrase, or the payload has been altered.'); process.exit(1); });
-	console.log(`Decrypted ${PAGE} into ${writeSource(new TextDecoder().decode(plaintext))}.`);
+	console.log(`Decrypted ${PAGE} into ${writeSource(text)}.`);
 } else {
 	console.error('Usage: node tools/vault.mjs encrypt|decrypt');
 	process.exit(1);
