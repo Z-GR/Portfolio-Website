@@ -825,3 +825,280 @@ ul.icons li .icon:before {
 #main > .posts.grouped + .posts.grouped {
 	margin-top: 3rem;
 }
+
+/* Private space: nav bar shown after unlocking (assets/js/vault.js). */
+#main > .private-nav {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin: 0 0 3rem 0;
+	padding: 0 0.75rem 0 1.25rem;
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+	font-family: var(--mono);
+	overflow: hidden;
+}
+
+.private-nav-path {
+	color: var(--accent);
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.private-nav ul {
+	display: flex;
+	flex: 1;
+	gap: 0.25rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.private-nav ul::-webkit-scrollbar {
+	display: none;
+}
+
+.private-nav li {
+	padding: 0;
+	flex-shrink: 0;
+}
+
+.private-nav li a {
+	display: block;
+	padding: 1rem 0.9rem;
+	border-bottom: 0;
+	color: var(--fg-muted);
+	font-weight: 500;
+	text-transform: lowercase;
+	white-space: nowrap;
+}
+
+.private-nav li a:hover {
+	background-color: var(--accent-soft);
+	color: var(--fg-bold) !important;
+}
+
+.private-nav li.active a {
+	color: var(--accent);
+	box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.private-nav li.active a:before {
+	content: "> ";
+}
+
+.private-nav .private-lock {
+	flex-shrink: 0;
+	height: auto;
+	line-height: 1.6;
+	padding: 0.35rem 0.9rem;
+	font-size: 0.8rem;
+}
+
+.private-nav .private-lock:before {
+	content: "$ ";
+	opacity: 0.7;
+}
+
+@media screen and (max-width: 736px) {
+	#main > .private-nav {
+		gap: 0.5rem;
+		padding-left: 1rem;
+	}
+
+	.private-nav-path {
+		display: none;
+	}
+
+	.private-nav li a {
+		padding: 0.9rem 0.45rem;
+		font-size: 0.85rem;
+	}
+
+	.private-nav .private-lock {
+		padding: 0.3rem 0.6rem;
+		font-size: 0.75rem;
+	}
+}
+
+/* Steam card on the private gaming page. */
+.steam-card {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	margin: 0 0 2.5rem 0;
+	padding: 1.5rem;
+	background: var(--panel-2);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+}
+
+.steam-avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 5rem;
+	height: 5rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg);
+	color: var(--fg-bold);
+	font-size: 2.5rem;
+}
+
+.steam-avatar img {
+	width: 100%;
+	height: 100%;
+	border-radius: var(--radius);
+	object-fit: cover;
+}
+
+.steam-id h3 {
+	margin: 0 0 0.25rem 0;
+}
+
+.steam-id p {
+	margin: 0 0 0.75rem 0;
+	color: var(--fg-muted);
+}
+
+.steam-id .actions {
+	margin: 0;
+}
+
+.steam-stats h3:before {
+	content: "## ";
+	color: var(--accent);
+}
+
+.steam-pending {
+	color: var(--fg-muted);
+}
+
+@media screen and (max-width: 736px) {
+	.steam-card {
+		flex-direction: column;
+		text-align: center;
+	}
+}
+
+/* Steam page: level bar, stat tiles and badge list. */
+.steam-level {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem 0.75rem;
+	margin: 0 0 1rem 0;
+	font-size: 0.85rem;
+}
+
+.steam-level-num {
+	color: var(--accent);
+	font-weight: 700;
+}
+
+.steam-level-bar {
+	position: relative;
+	display: inline-block;
+	width: 9rem;
+	height: 0.5rem;
+	border-radius: var(--radius);
+	background: var(--bg);
+	border: 1px solid var(--border);
+	overflow: hidden;
+}
+
+.steam-level-bar span {
+	position: absolute;
+	inset: 0 auto 0 0;
+	background: var(--accent);
+}
+
+.steam-level-xp {
+	color: var(--fg-muted);
+}
+
+.steam-tiles {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1rem;
+	list-style: none;
+	margin: 0 0 2.5rem 0;
+	padding: 0;
+}
+
+.steam-tiles li {
+	padding: 1rem 0.5rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--panel-2);
+	text-align: center;
+}
+
+.steam-tiles strong {
+	display: block;
+	color: var(--fg-bold);
+	font-size: 1.6rem;
+	line-height: 1.2;
+}
+
+.steam-tiles span {
+	color: var(--fg-muted);
+	font-size: 0.8rem;
+}
+
+#main ul.steam-badges {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.steam-badges li {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0 1rem;
+	padding: 0.6rem 0;
+	border-top: 1px solid var(--border);
+}
+
+.steam-badges li:first-child {
+	border-top: 0;
+}
+
+.steam-badge-name {
+	color: var(--fg-bold);
+}
+
+.steam-badge-name em {
+	color: var(--fg-muted);
+	font-style: normal;
+}
+
+.steam-badge-meta {
+	color: var(--fg-muted);
+	font-size: 0.85rem;
+}
+
+@media screen and (max-width: 736px) {
+	.steam-tiles {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.steam-level {
+		justify-content: center;
+	}
+}
+
+.steam-id ul.actions li {
+	padding-left: 0;
+}
+
+.steam-badges li {
+	align-items: baseline;
+}
