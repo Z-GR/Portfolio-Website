@@ -986,3 +986,119 @@ ul.icons li .icon:before {
 		text-align: center;
 	}
 }
+
+/* Steam page: level bar, stat tiles and badge list. */
+.steam-level {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem 0.75rem;
+	margin: 0 0 1rem 0;
+	font-size: 0.85rem;
+}
+
+.steam-level-num {
+	color: var(--accent);
+	font-weight: 700;
+}
+
+.steam-level-bar {
+	position: relative;
+	display: inline-block;
+	width: 9rem;
+	height: 0.5rem;
+	border-radius: var(--radius);
+	background: var(--bg);
+	border: 1px solid var(--border);
+	overflow: hidden;
+}
+
+.steam-level-bar span {
+	position: absolute;
+	inset: 0 auto 0 0;
+	background: var(--accent);
+}
+
+.steam-level-xp {
+	color: var(--fg-muted);
+}
+
+.steam-tiles {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1rem;
+	list-style: none;
+	margin: 0 0 2.5rem 0;
+	padding: 0;
+}
+
+.steam-tiles li {
+	padding: 1rem 0.5rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--panel-2);
+	text-align: center;
+}
+
+.steam-tiles strong {
+	display: block;
+	color: var(--fg-bold);
+	font-size: 1.6rem;
+	line-height: 1.2;
+}
+
+.steam-tiles span {
+	color: var(--fg-muted);
+	font-size: 0.8rem;
+}
+
+#main ul.steam-badges {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.steam-badges li {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0 1rem;
+	padding: 0.6rem 0;
+	border-top: 1px solid var(--border);
+}
+
+.steam-badges li:first-child {
+	border-top: 0;
+}
+
+.steam-badge-name {
+	color: var(--fg-bold);
+}
+
+.steam-badge-name em {
+	color: var(--fg-muted);
+	font-style: normal;
+}
+
+.steam-badge-meta {
+	color: var(--fg-muted);
+	font-size: 0.85rem;
+}
+
+@media screen and (max-width: 736px) {
+	.steam-tiles {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.steam-level {
+		justify-content: center;
+	}
+}
+
+.steam-id ul.actions li {
+	padding-left: 0;
+}
+
+.steam-badges li {
+	align-items: baseline;
+}
