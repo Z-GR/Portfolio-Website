@@ -1,0 +1,80 @@
+# Refreshes the Steam stats on the encrypted private gaming page.
+#
+# Runs every Monday, or on demand from the Actions tab ("Run workflow").
+# Needs these repository secrets (Settings > Secrets and variables > Actions):
+#   VAULT_PASS     passphrase for the private space
+#   STEAM_ID       Steam custom URL name (e.g. the part after /id/) or SteamID64
+#   STEAM_API_KEY  optional: adds hours played and most-played games
+#
+# Only the encrypted private.html is committed, and only when the data changed.
+# This repository is public, so the logs are too: tools/steam-sync.mjs never
+# prints any Steam data, and secret values are masked by GitHub.
+
+name: Steam sync
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: steam-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check secrets
+        id: secrets
+        env:
+          VAULT_PASS: ${{ secrets.VAULT_PASS }}
+          STEAM_ID: ${{ secrets.STEAM_ID }}
+        run: |
+          if [ -z "$VAULT_PASS" ] || [ -z "$STEAM_ID" ]; then
+            echo "::notice::Steam sync skipped: add the VAULT_PASS and STEAM_ID repository secrets to enable it."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out
+        if: steps.secrets.outputs.ready == 'true'
+        uses: actions/checkout@v4
+
+      - name: Sync Steam stats
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          VAULT_PASS: ${{ secrets.VAULT_PASS }}
+          STEAM_ID: ${{ secrets.STEAM_ID }}
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+        run: node tools/steam-sync.mjs
+
+      - name: Commit if changed
+        id: commit
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          if git diff --quiet -- private.html; then
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add private.html
+          git commit -m "Update private space"
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # Pushes made with the workflow token may not start a Pages build on their
+      # own, so request one explicitly.
+      - name: Rebuild GitHub Pages
+        if: steps.commit.outputs.pushed == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/${{ github.repository }}/pages/builds" --silent
