@@ -235,4 +235,120 @@
 		}
 	});
 
+	// GitHub activity pane --------------------------------------------------
+	// Contribution graph (drawn weekly by tools/github-activity.mjs) and a live
+	// "git log" of recent commits from GitHub's public API.
+
+	var MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+	function shortDate(iso) {
+		var p = iso.split('-');
+		return +p[2] + ' ' + MONTH_NAMES[+p[1] - 1] + ' ' + p[0];
+	}
+
+	function timeAgo(iso) {
+		var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000),
+			units = [['year', 31536000], ['month', 2592000], ['week', 604800], ['day', 86400], ['hour', 3600], ['minute', 60]];
+		for (var i = 0; i < units.length; i++) {
+			var n = Math.floor(s / units[i][1]);
+			if (n >= 1) return n + ' ' + units[i][0] + (n > 1 ? 's' : '') + ' ago';
+		}
+		return 'just now';
+	}
+
+	// Inline the graph SVG so day tooltips and the page font work; keep the <img> if that fails.
+	var graph = document.querySelector('.gh-graph');
+	if (graph && window.fetch) {
+		fetch(graph.getAttribute('data-src'))
+			.then(function(r) { if (!r.ok) throw r; return r.text(); })
+			.then(function(svg) {
+				graph.innerHTML = svg;
+				graph.scrollLeft = graph.scrollWidth; // most recent weeks first on narrow screens
+			})
+			.catch(function() {});
+	}
+
+	var caption = document.querySelector('.gh-caption');
+	if (caption && window.fetch) {
+		fetch(caption.getAttribute('data-src'))
+			.then(function(r) { if (!r.ok) throw r; return r.json(); })
+			.then(function(d) {
+				caption.textContent = d.total === null
+					? '// The contribution graph fills in after the first weekly sync.'
+					: '// ' + d.total.toLocaleString('en-GB') + ' contributions in the last year · updated ' + shortDate(d.updated);
+			})
+			.catch(function() {});
+	}
+
+	var log = document.querySelector('.gh-log');
+	if (log) {
+		var list = log.querySelector('.gh-commits'),
+			repo = log.getAttribute('data-repo'),
+			cacheKey = 'gh-commits:' + repo;
+
+		var showStatus = function(text) {
+			list.innerHTML = '';
+			var li = document.createElement('li');
+			li.className = 'gh-status';
+			li.textContent = text;
+			list.appendChild(li);
+		};
+
+		// Keep only what the panel shows; skip merge commits and automated bot commits.
+		var latest = function(commits) {
+			return commits.filter(function(c) {
+				var login = c.author && c.author.login || '';
+				return c.parents.length < 2 && !/\[bot\]$/.test(login) && !/\[bot\]$/.test(c.commit.author.name);
+			}).slice(0, 6).map(function(c) {
+				return { sha: c.sha.slice(0, 7), url: c.html_url, message: c.commit.message.split('\n')[0], date: c.commit.author.date };
+			});
+		};
+
+		var render = function(commits) {
+			if (!commits.length) return showStatus('// No recent commits.');
+			list.innerHTML = '';
+			commits.forEach(function(c) {
+				var li = document.createElement('li'),
+					sha = document.createElement('a'),
+					msg = document.createElement('span'),
+					when = document.createElement('time');
+				sha.className = 'gh-sha';
+				sha.href = c.url;
+				sha.target = '_blank';
+				sha.rel = 'noopener';
+				sha.textContent = c.sha;
+				msg.className = 'gh-msg';
+				msg.textContent = c.message;
+				when.className = 'gh-when';
+				when.dateTime = c.date;
+				when.textContent = timeAgo(c.date);
+				li.appendChild(sha);
+				li.appendChild(msg);
+				li.appendChild(when);
+				list.appendChild(li);
+			});
+		};
+
+		// GitHub allows 60 unauthenticated requests an hour, so reuse a result for 10 minutes.
+		var cached = null;
+		try { cached = JSON.parse(sessionStorage.getItem(cacheKey)); } catch (e) {}
+
+		if (cached && Date.now() - cached.at < 600000) {
+			render(cached.commits);
+		} else if (window.fetch) {
+			fetch('https://api.github.com/repos/' + repo + '/commits?per_page=30', { headers: { Accept: 'application/vnd.github+json' } })
+				.then(function(r) { if (!r.ok) throw r; return r.json(); })
+				.then(function(commits) {
+					commits = latest(commits);
+					render(commits);
+					try { sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), commits: commits })); } catch (e) {}
+				})
+				.catch(function() {
+					showStatus('// Couldn’t reach GitHub right now. Use “View full history” below.');
+				});
+		} else {
+			showStatus('// Recent commits need a newer browser.');
+		}
+	}
+
 })();

@@ -1,0 +1,45 @@
+# Redraws the GitHub contribution graph shown in the overview page's Activity pane.
+#
+# Runs every Monday, or on demand from the Actions tab ("Run workflow").
+# Uses GitHub's official GraphQL API with the workflow's own token, so no
+# secrets are needed. Commits only when the contribution data has changed.
+
+name: GitHub activity
+
+on:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-activity
+  cancel-in-progress: false
+
+jobs:
+  graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Draw contribution graph
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_USER: ${{ github.repository_owner }}
+        run: node tools/github-activity.mjs
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- images/github-contributions.svg assets/data/github-contributions.json \
+             && [ -z "$(git status --porcelain -- images/github-contributions.svg assets/data/github-contributions.json)" ]; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add images/github-contributions.svg assets/data/github-contributions.json
+          git commit -m "Update GitHub activity graph"
+          git push
