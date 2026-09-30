@@ -1102,3 +1102,101 @@ ul.icons li .icon:before {
 .steam-badges li {
 	align-items: baseline;
 }
+
+/* Activity pane: GitHub contribution graph and recent commits. */
+.gh-graph {
+	overflow-x: auto;
+	margin: 0 0 0.75rem 0;
+	padding: 1rem;
+	background: var(--panel-2);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	line-height: 0;
+	scrollbar-width: thin;
+	scrollbar-color: var(--border) transparent;
+}
+
+.gh-graph svg,
+.gh-graph img {
+	display: block;
+	max-width: none;
+	margin: 0 auto;
+}
+
+.gh-caption {
+	color: var(--fg-muted);
+	font-size: 0.85rem;
+	margin-bottom: 2.5rem;
+}
+
+.gh-log {
+	margin: 0 0 2rem 0;
+	padding: 1rem 1.25rem;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	font-size: 0.85rem;
+}
+
+.gh-cmd {
+	margin: 0 0 0.5rem 0;
+	color: var(--fg-bold);
+}
+
+.gh-cmd:before {
+	content: "$ ";
+	color: var(--accent);
+}
+
+#main ol.gh-commits {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.gh-commits li {
+	display: flex;
+	align-items: baseline;
+	gap: 0.9rem;
+	padding: 0.3rem 0;
+	line-height: 1.6;
+}
+
+.gh-sha {
+	flex-shrink: 0;
+	color: #e3b341;
+	border-bottom: 0;
+}
+
+.gh-msg {
+	flex: 1;
+	min-width: 0;
+	color: var(--fg);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gh-when {
+	flex-shrink: 0;
+	color: var(--fg-muted);
+}
+
+.gh-status {
+	color: var(--fg-muted);
+	margin: 0;
+}
+
+@media screen and (max-width: 736px) {
+	.gh-commits li {
+		flex-wrap: wrap;
+		gap: 0 0.75rem;
+		padding: 0.45rem 0;
+	}
+
+	.gh-msg {
+		flex-basis: 100%;
+		order: 3;
+		white-space: normal;
+	}
+}
